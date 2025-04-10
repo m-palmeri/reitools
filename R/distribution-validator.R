@@ -1,47 +1,47 @@
 DistributionValidator <- R6::R6Class(
   classname = "DistributionValidator",
   private = list(
-    expected_params <- list(),
+    expected_params = list(),
 
     # check for the right parameter names
-    check_names <- function(params) {
+    check_names = function(params) {
       assertthat::assert_that(
-        setequal(params, private$expected_params),
+        setequal(names(params), private$expected_params),
         msg = paste("params should include", toString(private$expected_params))
       )
-    }
+    },
 
     # check for the right order of parameters
-    check_order <- function(params) {
+    check_order = function(params) {
       assertthat::assert_that(
-        all(params == private$expected_params),
+        all(names(params) == private$expected_params),
         msg = paste("params should have the order", toString(private$expected_params))
       )
-    }
+    },
 
     # check each parameter is just length one
-    check_length <- function(params) {
+    check_length = function(params) {
       assertthat::assert_that(
         all(sapply(params, length) == 1),
         msg = "each element of params should be of length 1"
       )
-    }
+    },
 
     # check that parameter values are numeric
-    check_numeric <- function(params) {
+    check_numeric = function(params) {
       assertthat::assert_that(
         all(sapply(params, is.numeric)),
         msg = "each element of params should be numeric"
       )
-    }
+    },
 
     # check that parameter values are valid
-    check_valid <- function(params) {
+    check_valid = function(params) {
 
     }
   ),
   public = list(
-    validate <- function(params) {
+    validate = function(params) {
       private$check_names(params)
       private$check_order(params)
       private$check_length(params)
