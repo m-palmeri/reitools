@@ -55,7 +55,14 @@ NormalDistributionValidator <- R6::R6Class(
   classname = "NormalDistributionValidator",
   inherit = DistributionValidator,
   private = list(
-    expected_params = c("mean", "sd")
+    expected_params = c("mean", "sd"),
+
+    check_valid = function(params) {
+      assertthat::assert_that(
+        params$sd > 0,
+        msg = "sd parameter must be greater than 0"
+      )
+    }
   )
 )
 
@@ -63,7 +70,14 @@ BetaDistributionValidator <- R6::R6Class(
   classname = "BetaDistributionValidator",
   inherit = DistributionValidator,
   private = list(
-    expected_params = c("shape1", "shape2")
+    expected_params = c("alpha", "beta"),
+
+    check_valid = function(params) {
+      assertthat::assert_that(
+        params$alpha > 0 && params$beta > 0,
+        msg = "alpha and beta parameters must be greater than 0"
+      )
+    }
   )
 )
 
