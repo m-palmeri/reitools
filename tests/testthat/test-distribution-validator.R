@@ -46,3 +46,11 @@ test_that("beta distribution validator testing", {
     "each element of params should be numeric"
   )
 })
+
+
+test_that("validate_distribution_params helper function testing", {
+  expect_no_error(validate_distribution_params(list(mean = 1, sd = 1), "normal"))
+  expect_no_error(validate_distribution_params(list(mean = 0, sd = 1000), "normal"))
+  expect_no_error(validate_distribution_params(list(shape1 = 1, shape2 = 1), "beta"))
+  expect_no_error(validate_distribution_params(list(shape1 = 0.1, shape2 = 0.5), "beta"))
+})
