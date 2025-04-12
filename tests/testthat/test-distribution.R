@@ -96,3 +96,40 @@ test_that("BetaDistribution testing initiation and param checks", {
     "shape2 parameter must be greater than 0"
   )
 })
+
+test_that("BetaDistribution functionality testing", {
+  shape1s <- c(0.5, 1, 5, 25)
+  shape2s <- c(0.5, 5, 1, 15)
+
+  purrr::walk2(shape1s, shape2s, function(shape1, shape2) {
+    beta_dist <- BetaDistribution$new(
+      shape1 = shape1,
+      shape2 = shape2
+    )
+
+    #pdf testing
+    x <- c(0.1, 0.4, 0.55, 0.7, 0.9)
+    expect_equal(
+      beta_dist$pdf(x),
+      dbeta(x, shape1 = shape1, shape2 = shape2)
+    )
+
+    #cdf testing
+    expect_equal(
+      beta_dist$cdf(x),
+      pbeta(x, shape1 = shape1, shape2 = shape2)
+    )
+
+    #quantile testing
+    expect_equal(
+      beta_dist$quantile(x),
+      qbeta(x, shape1 = shape1, shape2 = shape2)
+    )
+
+    #random testing
+    expect_equal(
+      beta_dist$random(n = 4, seed = 123),
+      withr::with_seed(123, rbeta(4, shape1 = shape1, shape2 = shape2))
+    )
+  })
+})
