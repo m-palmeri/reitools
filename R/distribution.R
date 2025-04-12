@@ -12,7 +12,10 @@ Distribution <- R6::R6Class(
   private = list(
     .params = list(),
     type = character(),
-    randomizer = NULL,
+    pdf_function = NULL,
+    cdf_function = NULL,
+    quantile_function = NULL,
+    randomizer_function = NULL,
 
     # check each parameter is just length one
     check_length = function(param, name) {
@@ -39,8 +42,27 @@ Distribution <- R6::R6Class(
     }
   ),
   public = list(
-    random = function(n = 1) {
-      value <- private$randomizer(n, unlist(private$.params))
+    pdf = function(x) {
+      args <- append(list(x), private$.params)
+      value <- do.call(private$pdf_function, args)
+      return(value)
+    },
+
+    cdf = function(x) {
+      args <- append(list(x), private$.params)
+      value <- do.call(private$cdf_function, args)
+      return(value)
+    },
+
+    quantile = function(q) {
+      args <- append(list(q), private$.params)
+      value <- do.call(private$quantile_function, args)
+      return(value)
+    },
+
+    random = function(n = 1, seed = 1) {
+      args <- append(list(n), private$.params)
+      value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
     }
   )
@@ -71,13 +93,17 @@ NormalDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "normal",
-    randomizer = rnorm
+    type = "normal"
   ),
   public = list(
     initialize = function(mean, sd) {
       self$mean <- mean
       self$sd <- sd
+
+      private$pdf_function <- stats::dnorm
+      private$cdf_function <- stats::pnorm
+      private$quantile_function <- stats::qnorm
+      private$randomizer_function <- stats::rnorm
     }
   )
 )
@@ -108,13 +134,17 @@ BetaDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "beta",
-    randomizer = rbeta
+    type = "beta"
   ),
   public = list(
     initialize = function(shape1, shape2) {
       self$shape1 <- shape1
       self$shape2 <- shape2
+
+      private$pdf_function <- stats::dbeta
+      private$cdf_function <- stats::pbeta
+      private$quantile_function <- stats::qbeta
+      private$randomizer_function <- stats::rbeta
     }
   )
 )
