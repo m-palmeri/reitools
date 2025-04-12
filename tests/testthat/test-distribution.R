@@ -1,3 +1,5 @@
+### Normal Distribution testing -----------------------------------------------
+
 test_that("NormalDistribution testing initiation and param checks", {
 
   expect_error(
@@ -24,6 +26,46 @@ test_that("NormalDistribution testing initiation and param checks", {
   )
 })
 
+test_that("NormalDistribution functionality testing", {
+  means <- c(0, 1, 100, 20)
+  sds <- c(1, 0.2, 5, 1000)
+
+  purrr::walk2(means, sds, function(mean, sd) {
+    normal_dist <- NormalDistribution$new(
+      mean = mean,
+      sd = sd
+    )
+
+    #pdf testing
+    x <- c(mean - sd, mean - sd/2, mean + sd/3, mean + 2*sd)
+    expect_equal(
+      normal_dist$pdf(x),
+      dnorm(x, mean = mean, sd = sd)
+    )
+
+    #cdf testing
+    expect_equal(
+      normal_dist$cdf(x),
+      pnorm(x, mean = mean, sd = sd)
+    )
+
+    #quantile testing
+    q <- c(0.1, 0.4, 0.7, 0.95)
+    expect_equal(
+      normal_dist$quantile(q),
+      qnorm(q, mean = mean, sd = sd)
+    )
+
+    #random testing
+    expect_equal(
+      normal_dist$random(n = 4, seed = 123),
+      withr::with_seed(123, rnorm(4, mean = mean, sd = sd))
+    )
+  })
+})
+
+
+### Beta Distribution testing -------------------------------------------------
 
 test_that("BetaDistribution testing initiation and param checks", {
 
@@ -53,4 +95,41 @@ test_that("BetaDistribution testing initiation and param checks", {
     BetaDistribution$new(shape1 = 1, shape2 = 0),
     "shape2 parameter must be greater than 0"
   )
+})
+
+test_that("BetaDistribution functionality testing", {
+  shape1s <- c(0.5, 1, 5, 25)
+  shape2s <- c(0.5, 5, 1, 15)
+
+  purrr::walk2(shape1s, shape2s, function(shape1, shape2) {
+    beta_dist <- BetaDistribution$new(
+      shape1 = shape1,
+      shape2 = shape2
+    )
+
+    #pdf testing
+    x <- c(0.1, 0.4, 0.55, 0.7, 0.9)
+    expect_equal(
+      beta_dist$pdf(x),
+      dbeta(x, shape1 = shape1, shape2 = shape2)
+    )
+
+    #cdf testing
+    expect_equal(
+      beta_dist$cdf(x),
+      pbeta(x, shape1 = shape1, shape2 = shape2)
+    )
+
+    #quantile testing
+    expect_equal(
+      beta_dist$quantile(x),
+      qbeta(x, shape1 = shape1, shape2 = shape2)
+    )
+
+    #random testing
+    expect_equal(
+      beta_dist$random(n = 4, seed = 123),
+      withr::with_seed(123, rbeta(4, shape1 = shape1, shape2 = shape2))
+    )
+  })
 })
