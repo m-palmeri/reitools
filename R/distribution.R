@@ -25,7 +25,7 @@ Distribution <- R6::R6Class(
       )
     },
 
-    # check that parameter values are numeric
+    # check that parameter value is numeric
     check_numeric = function(param, name) {
       assertthat::assert_that(
         is.numeric(param),
@@ -33,11 +33,19 @@ Distribution <- R6::R6Class(
       )
     },
 
-    # check that parameter values are valid
-    check_positive = function(param, name) {
+    # check that parameter value is greater than a minimum value
+    check_greater_than = function(param, name, value) {
       assertthat::assert_that(
-        param > 0,
-        msg = glue::glue("{name} parameter must be greater than 0")
+        param > value,
+        msg = glue::glue("{name} parameter must be greater than {value}")
+      )
+    },
+
+    # check that parameter value is greater than a minimum value
+    check_lesser_than = function(param, name, value) {
+      assertthat::assert_that(
+        param < value,
+        msg = glue::glue("{name} parameter must be lesser than {value}")
       )
     }
   ),
@@ -87,7 +95,7 @@ NormalDistribution <- R6::R6Class(
       } else {
         private$check_length(value, "sd")
         private$check_numeric(value, "sd")
-        private$check_positive(value, "sd")
+        private$check_greater_than(value, "sd", 0)
         private$.params$sd <- value
       }
     }
@@ -118,7 +126,7 @@ BetaDistribution <- R6::R6Class(
       } else {
         private$check_length(value, "shape1")
         private$check_numeric(value, "shape1")
-        private$check_positive(value, "shape1")
+        private$check_greater_than(value, "shape1", 0)
         private$.params$shape1 <- value
       }
     },
@@ -128,7 +136,7 @@ BetaDistribution <- R6::R6Class(
       } else {
         private$check_length(value, "shape2")
         private$check_numeric(value, "shape2")
-        private$check_positive(value, "shape2")
+        private$check_greater_than(value, "shape2", 0)
         private$.params$shape2 <- value
       }
     }
@@ -159,7 +167,7 @@ GammaDistribution <- R6::R6Class(
       } else {
         private$check_length(value, "shape")
         private$check_numeric(value, "shape")
-        private$check_positive(value, "shape")
+        private$check_greater_than(value, "shape", 0)
         private$.params$shape <- value
       }
     },
@@ -169,7 +177,7 @@ GammaDistribution <- R6::R6Class(
       } else {
         private$check_length(value, "rate")
         private$check_numeric(value, "rate")
-        private$check_positive(value, "rate")
+        private$check_greater_than(value, "rate", 0)
         private$.params$rate <- value
       }
     }
@@ -200,7 +208,7 @@ ExponentialDistribution <- R6::R6Class(
       } else {
         private$check_length(value, "rate")
         private$check_numeric(value, "rate")
-        private$check_positive(value, "rate")
+        private$check_greater_than(value, "rate", 0)
         private$.params$rate <- value
       }
     }
@@ -216,6 +224,46 @@ ExponentialDistribution <- R6::R6Class(
       private$cdf_function <- stats::pexp
       private$quantile_function <- stats::qexp
       private$randomizer_function <- stats::rexp
+    }
+  )
+)
+
+UniformDistribution <- R6::R6Class(
+  classname = "UniformDistribution",
+  inherit = Distribution,
+  active = list(
+    min = function(value) {
+      if (missing(value)) {
+        return(private$.params$min)
+      } else {
+        private$check_length(value, "min")
+        private$check_numeric(value, "min")
+        private$.params$min <- value
+      }
+    },
+    max = function(value) {
+      if (missing(value)) {
+        return(private$.params$max)
+      } else {
+        private$check_length(value, "max")
+        private$check_numeric(value, "max")
+        private$check_greater_than(value, "max", self$min)
+        private$.params$max <- value
+      }
+    }
+  ),
+  private = list(
+    type = "uniform"
+  ),
+  public = list(
+    initialize = function(min, max) {
+      self$min <- min
+      self$max <- max
+
+      private$pdf_function <- stats::dunif
+      private$cdf_function <- stats::punif
+      private$quantile_function <- stats::qunif
+      private$randomizer_function <- stats::runif
     }
   )
 )
