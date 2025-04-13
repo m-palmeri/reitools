@@ -133,3 +133,75 @@ test_that("BetaDistribution functionality testing", {
     )
   })
 })
+
+
+### Gamma Distribution testing ------------------------------------------------
+
+test_that("GammaDistribution testing initiation and param checks", {
+
+  expect_error(
+    GammaDistribution$new(shape = c(1, 2), rate = 1),
+    "shape parameter should be of length 1"
+  )
+  expect_error(
+    GammaDistribution$new(shape = 1, rate = c(1, 2)),
+    "rate parameter should be of length 1"
+  )
+
+  expect_error(
+    GammaDistribution$new(shape = "b", rate = 1),
+    "shape parameter should be numeric"
+  )
+  expect_error(
+    GammaDistribution$new(shape = 1, rate = "a"),
+    "rate parameter should be numeric"
+  )
+
+  expect_error(
+    GammaDistribution$new(shape = 0, rate = 1),
+    "shape parameter must be greater than 0"
+  )
+  expect_error(
+    GammaDistribution$new(shape = 1, rate = 0),
+    "rate parameter must be greater than 0"
+  )
+})
+
+test_that("GammaDistribution functionality testing", {
+  shape <- c(0.5, 1, 5, 25)
+  rate <- c(0.5, 5, 1, 15)
+
+  purrr::walk2(shape, rate, function(shape, rate) {
+    gamma_dist <- GammaDistribution$new(
+      shape = shape,
+      rate = rate
+    )
+
+    #pdf testing
+    x <- c(0.1, 0.3, shape/rate, shape/rate + 0.75, shape/rate + 2)
+    expect_equal(
+      gamma_dist$pdf(x),
+      dgamma(x, shape = shape, rate = rate)
+    )
+
+    #cdf testing
+    expect_equal(
+      gamma_dist$cdf(x),
+      pgamma(x, shape = shape, rate = rate)
+    )
+
+    #quantile testing
+    q <- c(0.1, 0.4, 0.7, 0.95)
+    expect_equal(
+      gamma_dist$quantile(q),
+      qgamma(q, shape = shape, rate = rate)
+    )
+
+    #random testing
+    expect_equal(
+      gamma_dist$random(n = 4, seed = 123),
+      withr::with_seed(123, rgamma(4, shape = shape, rate = rate))
+    )
+  })
+})
+
