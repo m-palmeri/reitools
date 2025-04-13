@@ -72,6 +72,16 @@ Distribution <- R6::R6Class(
       args <- append(list(n), private$.params)
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
+    },
+
+    graph = function(method = "ggplot2") {
+      if (method == "base") {
+        p <- private$graph.base()
+      } else if (method == "ggplot2") {
+        p <- private$graph.ggplot2()
+      }
+
+      return(p)
     }
   )
 )
