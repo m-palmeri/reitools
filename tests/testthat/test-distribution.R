@@ -261,3 +261,77 @@ test_that("ExponentialDistribution functionality testing", {
     )
   })
 })
+
+
+### Uniform Distribution testing ----------------------------------------------
+
+test_that("UniformDistribution testing initiation and param checks", {
+
+  expect_error(
+    UniformDistribution$new(min = c(1, 2), max = 1),
+    "min parameter should be of length 1"
+  )
+  expect_error(
+    UniformDistribution$new(min = 1, max = c(1, 2)),
+    "max parameter should be of length 1"
+  )
+
+  expect_error(
+    UniformDistribution$new(min = "b", max = 1),
+    "min parameter should be numeric"
+  )
+  expect_error(
+    UniformDistribution$new(min = 1, max = "a"),
+    "max parameter should be numeric"
+  )
+
+  expect_error(
+    UniformDistribution$new(min = 0, max = -1),
+    "max parameter must be greater than 0"
+  )
+  expect_error(
+    UniformDistribution$new(min = 10, max = 5),
+    "max parameter must be greater than 10"
+  )
+})
+
+test_that("UniformDistribution functionality testing", {
+  mins <- c(0, -4, 10, 30)
+  maxs <- c(0.5, 3, 15, 1000)
+
+  purrr::walk2(mins, maxs, function(min, max) {
+    uniform_dist <- UniformDistribution$new(
+      min = min,
+      max = max
+    )
+
+    #pdf testing
+    diff <- max - min
+    x <- c(min + diff/10, min + diff/4 + min + 3*diff/5, min + 99*diff/100)
+    expect_equal(
+      uniform_dist$pdf(x),
+      dunif(x, min = min, max = max)
+    )
+
+    #cdf testing
+    expect_equal(
+      uniform_dist$cdf(x),
+      punif(x, min = min, max = max)
+    )
+
+    #quantile testing
+    q <- c(0.1, 0.4, 0.7, 0.95)
+    expect_equal(
+      uniform_dist$quantile(q),
+      qunif(q, min = min, max = max)
+    )
+
+    #random testing
+    expect_equal(
+      uniform_dist$random(n = 4, seed = 123),
+      withr::with_seed(123, runif(4, min = min, max = max))
+    )
+  })
+})
+
+
