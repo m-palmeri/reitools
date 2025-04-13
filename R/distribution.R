@@ -189,3 +189,33 @@ GammaDistribution <- R6::R6Class(
     }
   )
 )
+
+ExponentialDistribution <- R6::R6Class(
+  classname = "ExponentialDistribution",
+  inherit = Distribution,
+  active = list(
+    rate = function(value) {
+      if (missing(value)) {
+        return(private$.params$rate)
+      } else {
+        private$check_length(value, "rate")
+        private$check_numeric(value, "rate")
+        private$check_positive(value, "rate")
+        private$.params$rate <- value
+      }
+    }
+  ),
+  private = list(
+    type = "exponential"
+  ),
+  public = list(
+    initialize = function(rate) {
+      self$rate <- rate
+
+      private$pdf_function <- stats::dexp
+      private$cdf_function <- stats::pexp
+      private$quantile_function <- stats::qexp
+      private$randomizer_function <- stats::rexp
+    }
+  )
+)

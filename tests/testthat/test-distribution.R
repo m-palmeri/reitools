@@ -168,10 +168,10 @@ test_that("GammaDistribution testing initiation and param checks", {
 })
 
 test_that("GammaDistribution functionality testing", {
-  shape <- c(0.5, 1, 5, 25)
-  rate <- c(0.5, 5, 1, 15)
+  shapes <- c(0.5, 1, 5, 25)
+  rates <- c(0.5, 5, 1, 15)
 
-  purrr::walk2(shape, rate, function(shape, rate) {
+  purrr::walk2(shapes, rates, function(shape, rate) {
     gamma_dist <- GammaDistribution$new(
       shape = shape,
       rate = rate
@@ -205,3 +205,59 @@ test_that("GammaDistribution functionality testing", {
   })
 })
 
+
+### Exponential Distribution testing ------------------------------------------
+
+test_that("ExponentialDistribution testing initiation and param checks", {
+
+  expect_error(
+    ExponentialDistribution$new(rate = c(1, 2)),
+    "rate parameter should be of length 1"
+  )
+
+  expect_error(
+    ExponentialDistribution$new(rate = "b"),
+    "rate parameter should be numeric"
+  )
+
+  expect_error(
+    ExponentialDistribution$new(rate = 0),
+    "rate parameter must be greater than 0"
+  )
+})
+
+test_that("ExponentialDistribution functionality testing", {
+  rates <- c(0.5, 5, 1, 15)
+
+  purrr::walk(rates, function(rate) {
+    exp_dist <- ExponentialDistribution$new(
+      rate = rate
+    )
+
+    #pdf testing
+    x <- c(0.5, 1, 2, 4, 10)
+    expect_equal(
+      exp_dist$pdf(x),
+      dexp(x, rate = rate)
+    )
+
+    #cdf testing
+    expect_equal(
+      exp_dist$cdf(x),
+      pexp(x, rate = rate)
+    )
+
+    #quantile testing
+    q <- c(0.1, 0.4, 0.7, 0.95)
+    expect_equal(
+      exp_dist$quantile(q),
+      qexp(q, rate = rate)
+    )
+
+    #random testing
+    expect_equal(
+      exp_dist$random(n = 4, seed = 123),
+      withr::with_seed(123, rexp(4, rate = rate))
+    )
+  })
+})
