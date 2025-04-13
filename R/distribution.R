@@ -219,3 +219,42 @@ ExponentialDistribution <- R6::R6Class(
     }
   )
 )
+
+UniformDistribution <- R6::R6Class(
+  classname = "UniformDistribution",
+  inherit = Distribution,
+  active = list(
+    min = function(value) {
+      if (missing(value)) {
+        return(private$.params$min)
+      } else {
+        private$check_length(value, "min")
+        private$check_numeric(value, "min")
+        private$.params$min <- value
+      }
+    },
+    max = function(value) {
+      if (missing(value)) {
+        return(private$.params$max)
+      } else {
+        private$check_length(value, "max")
+        private$check_numeric(value, "max")
+        private$.params$max <- value
+      }
+    }
+  ),
+  private = list(
+    type = "uniform"
+  ),
+  public = list(
+    initialize = function(min, max) {
+      self$min <- min
+      self$max <- max
+
+      private$pdf_function <- stats::dunif
+      private$cdf_function <- stats::punif
+      private$quantile_function <- stats::qunif
+      private$randomizer_function <- stats::runif
+    }
+  )
+)
