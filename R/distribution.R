@@ -148,3 +148,44 @@ BetaDistribution <- R6::R6Class(
     }
   )
 )
+
+GammaDistribution <- R6::R6Class(
+  classname = "GammaDistribution",
+  inherit = Distribution,
+  active = list(
+    shape = function(value) {
+      if (missing(value)) {
+        return(private$.params$shape)
+      } else {
+        private$check_length(value, "shape")
+        private$check_numeric(value, "shape")
+        private$check_positive(value, "shape")
+        private$.params$shape <- value
+      }
+    },
+    rate = function(value) {
+      if (missing(value)) {
+        return(private$.params$rate)
+      } else {
+        private$check_length(value, "rate")
+        private$check_numeric(value, "rate")
+        private$check_positive(value, "rate")
+        private$.params$rate <- value
+      }
+    }
+  ),
+  private = list(
+    type = "gamma"
+  ),
+  public = list(
+    initialize = function(shape, rate) {
+      self$shape <- shape
+      self$rate <- rate
+
+      private$pdf_function <- stats::dgamma
+      private$cdf_function <- stats::pgamma
+      private$quantile_function <- stats::qgamma
+      private$randomizer_function <- stats::rgamma
+    }
+  )
+)
