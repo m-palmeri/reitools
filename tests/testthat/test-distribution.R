@@ -335,3 +335,44 @@ test_that("UniformDistribution functionality testing", {
 })
 
 
+### graph method testing ------------------------------------------------------
+
+test_that("graph method parameters checks work as expected", {
+  normal_dist <- NormalDistribution$new(
+    mean = 0,
+    sd = 1
+  )
+
+  expect_error(
+    normal_dist$graph(graph_method = "test"),
+    "graph method 'test' not supported."
+  )
+
+  expect_error(
+    normal_dist$graph(xlim = 1),
+    "xlim parameter should be of length 2"
+  )
+
+  expect_error(
+    normal_dist$graph(xlim = c("a", 1)),
+    "xlim parameter should be numeric"
+  )
+  expect_error(
+    normal_dist$graph(xlim = c(1, "a")),
+    "xlim parameter should be numeric"
+  )
+
+  expect_error(
+    normal_dist$graph(N = "a"),
+    "N parameter should be numeric"
+  )
+})
+
+test_that("graph.base works as expected", {
+
+})
+
+test_that("graph.ggplot2 works as expected", {
+
+})
+
