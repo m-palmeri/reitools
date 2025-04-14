@@ -18,10 +18,10 @@ Distribution <- R6::R6Class(
     randomizer_function = NULL,
 
     # check each parameter is just length one
-    check_length = function(param, name) {
+    check_length = function(param, name, expected_length = 1) {
       assertthat::assert_that(
-        length(param) == 1,
-        msg = glue::glue("{name} parameter should be of length 1")
+        length(param) == expected_length,
+        msg = glue::glue("{name} parameter should be of length {expected_length}")
       )
     },
 
@@ -47,6 +47,16 @@ Distribution <- R6::R6Class(
         param < value,
         msg = glue::glue("{name} parameter must be lesser than {value}")
       )
+    },
+
+    # graphing with base R
+    graph.base = function(range) {
+
+    },
+
+    # graphing with ggplot2
+    graph.ggplot2 = function(range) {
+
     }
   ),
   public = list(
@@ -74,11 +84,32 @@ Distribution <- R6::R6Class(
       return(value)
     },
 
-    graph = function(method = "ggplot2") {
-      if (method == "base") {
-        p <- private$graph.base()
-      } else if (method == "ggplot2") {
-        p <- private$graph.ggplot2()
+    graph = function(graph_method = "ggplot2",
+                     xlim = NULL,
+                     N = 1000) {
+      # parameter checks
+      private$check_length(xlim, "xlim", 2)
+      private$check_numeric(xlim[1], "xlim")
+      private$check_numeric(xlim[2], "xlim")
+      private$check_numeric(N, "N")
+
+      if (is.null(xlim) && self$type == "beta") {
+        xlim <- c(0, 1)
+      } else if (is.null(xlim)) {
+        xlim <- c(self$quantile(0.001), sefl$quantile(0.999))
+      }
+
+      x <- seq(from = xlim[1], xlim[2], length.out = N)
+
+      y <- private$pdf(x)
+
+      if (graph_method == "base") {
+        p <- private$graph.base(x, y)
+      } else if (graph_method == "ggplot2") {
+        p <- private$graph.ggplot2(x, y)
+      } else {
+        stop(glue::glue("graph method '{graph_method}' not supported. Check help",
+                        "docs for supported graphing methods"))
       }
 
       return(p)
