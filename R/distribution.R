@@ -7,11 +7,19 @@ Distribution <- R6::R6Class(
       } else {
         stop("params is read-only. To change this, change the individual parameter fields")
       }
+    },
+
+    type = function(value) {
+      if (missing(value)) {
+        return(private$.type)
+      } else {
+        stop("type is read-only")
+      }
     }
   ),
   private = list(
     .params = list(),
-    type = character(),
+    .type = character(),
     pdf_function = NULL,
     cdf_function = NULL,
     quantile_function = NULL,
@@ -50,12 +58,12 @@ Distribution <- R6::R6Class(
     },
 
     # graphing with base R
-    graph.base = function(range) {
+    graph.base = function(x, y) {
 
     },
 
     # graphing with ggplot2
-    graph.ggplot2 = function(range) {
+    graph.ggplot2 = function(x, y) {
 
     }
   ),
@@ -87,17 +95,17 @@ Distribution <- R6::R6Class(
     graph = function(graph_method = "ggplot2",
                      xlim = NULL,
                      N = 1000) {
-      # parameter checks
-      private$check_length(xlim, "xlim", 2)
-      private$check_numeric(xlim[1], "xlim")
-      private$check_numeric(xlim[2], "xlim")
-      private$check_numeric(N, "N")
-
       if (is.null(xlim) && self$type == "beta") {
         xlim <- c(0, 1)
       } else if (is.null(xlim)) {
         xlim <- c(self$quantile(0.001), sefl$quantile(0.999))
       }
+
+      # parameter checks
+      private$check_length(xlim, "xlim", 2)
+      private$check_numeric(xlim[1], "xlim")
+      private$check_numeric(xlim[2], "xlim")
+      private$check_numeric(N, "N")
 
       x <- seq(from = xlim[1], xlim[2], length.out = N)
 
@@ -142,7 +150,7 @@ NormalDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "normal"
+    .type = "normal"
   ),
   public = list(
     initialize = function(mean, sd) {
@@ -183,7 +191,7 @@ BetaDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "beta"
+    .type = "beta"
   ),
   public = list(
     initialize = function(shape1, shape2) {
@@ -224,7 +232,7 @@ GammaDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "gamma"
+    .type = "gamma"
   ),
   public = list(
     initialize = function(shape, rate) {
@@ -255,7 +263,7 @@ ExponentialDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "exponential"
+    .type = "exponential"
   ),
   public = list(
     initialize = function(rate) {
@@ -294,7 +302,7 @@ UniformDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "uniform"
+    .type = "uniform"
   ),
   public = list(
     initialize = function(min, max) {
