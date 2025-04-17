@@ -55,16 +55,6 @@ Distribution <- R6::R6Class(
         param < value,
         msg = glue::glue("{name} parameter must be lesser than {value}")
       )
-    },
-
-    # graphing with base R
-    graph.base = function(x, y) {
-
-    },
-
-    # graphing with ggplot2
-    graph.ggplot2 = function(x, y) {
-
     }
   ),
   public = list(
@@ -90,6 +80,31 @@ Distribution <- R6::R6Class(
       args <- append(list(n), private$.params)
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
+    },
+
+    plot = function(to = NULL,
+                    from = NULL,
+                    xlim = NULL,
+                    xlab = NULL,
+                    ylab = NULL,
+                    main = NULL,
+                    ...) {
+      if (is.null(xlim)) {
+        from <- from %||% self$quantile(0.001)
+        to <- to %||% self$quantile(0.999)
+      } else {
+        from <- from %||% xlim[1]
+        to <- to %||% xlim[2]
+      }
+
+      xlab <- xlab %||% "x"
+      ylab <- ylab %||% "PDF"
+      main <- main %||% paste(toupper(self$type), "Distribution")
+
+      pdf_function <- private$pdf_function
+
+      curve(expr = pdf_function, from = from, to = to, xlim = xlim, ylab = ylab,
+            ...)
     },
 
     graph = function(graph_method = "ggplot2",
