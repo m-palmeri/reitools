@@ -103,39 +103,8 @@ Distribution <- R6::R6Class(
 
       pdf_function <- private$pdf_function
 
-      curve(expr = pdf_function, from = from, to = to, xlim = xlim, ylab = ylab,
-            ...)
-    },
-
-    graph = function(graph_method = "ggplot2",
-                     xlim = NULL,
-                     N = 1000) {
-      if (is.null(xlim) && self$type == "beta") {
-        xlim <- c(0, 1)
-      } else if (is.null(xlim)) {
-        xlim <- c(self$quantile(0.001), sefl$quantile(0.999))
-      }
-
-      # parameter checks
-      private$check_length(xlim, "xlim", 2)
-      private$check_numeric(xlim[1], "xlim")
-      private$check_numeric(xlim[2], "xlim")
-      private$check_numeric(N, "N")
-
-      x <- seq(from = xlim[1], xlim[2], length.out = N)
-
-      y <- private$pdf(x)
-
-      if (graph_method == "base") {
-        p <- private$graph.base(x, y)
-      } else if (graph_method == "ggplot2") {
-        p <- private$graph.ggplot2(x, y)
-      } else {
-        stop(glue::glue("graph method '{graph_method}' not supported. Check help",
-                        "docs for supported graphing methods"))
-      }
-
-      return(p)
+      curve(expr = pdf_function, from = from, to = to, xlim = xlim,
+            ylab = ylab, main = main, ...)
     }
   )
 )
