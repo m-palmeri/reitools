@@ -431,3 +431,56 @@ test_that("snapshot tests for plot method", {
     )$plot()
   )
 })
+
+
+### print method testing ------------------------------------------------------
+
+test_that("print method works as expected", {
+  normal_dist <- NormalDistribution$new(
+    mean = 2,
+    sd = 1
+  )
+  expect_output(
+    normal_dist$print(),
+    "Normal Distribution \\(mean = 2, sd = 1\\)"
+  )
+  expect_output(
+    print(normal_dist),
+    "Normal Distribution \\(mean = 2, sd = 1\\)"
+  )
+
+  beta_dist <- BetaDistribution$new(
+    shape1 = 5,
+    shape2 = 2
+  )
+  expect_output(
+    print(beta_dist),
+    "Beta Distribution \\(shape1 = 5, shape2 = 2\\)"
+  )
+
+  gamma_dist <- GammaDistribution$new(
+    shape = 2,
+    rate = 5
+  )
+  expect_output(
+    print(gamma_dist),
+    "Gamma Distribution \\(shape = 2, rate = 5\\)"
+  )
+
+  exp_dist <- ExponentialDistribution$new(
+    rate = 2
+  )
+  expect_output(
+    print(exp_dist),
+    "Exponential Distribution \\(rate = 2\\)"
+  )
+
+  uniform_dist <- UniformDistribution$new(
+    min = 2,
+    max = 100
+  )
+  expect_output(
+    print(uniform_dist),
+    "Uniform Distribution \\(min = 2, max = 100\\)"
+  )
+})
