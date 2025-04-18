@@ -88,8 +88,12 @@ Distribution <- R6::R6Class(
                     xlab = NULL,
                     ylab = NULL,
                     main = NULL,
+                    n = 100,
                     ...) {
-      if (is.null(xlim)) {
+      if (self$type == "beta" && is.null(xlim)) {
+        from <- from %||% 0
+        to <- to %||% 1
+      } else if (is.null(xlim)) {
         from <- from %||% self$quantile(0.001)
         to <- to %||% self$quantile(0.999)
       } else {
@@ -99,12 +103,20 @@ Distribution <- R6::R6Class(
 
       xlab <- xlab %||% "x"
       ylab <- ylab %||% "PDF"
-      main <- main %||% paste(toupper(self$type), "Distribution")
+      main <- main %||% paste(tools::toTitleCase(self$type), "Distribution")
 
-      pdf_function <- private$pdf_function
+      pdf_function <- self$pdf
 
-      curve(expr = pdf_function, from = from, to = to, xlim = xlim,
-            ylab = ylab, main = main, ...)
+      temp <- curve(expr = pdf_function, from = from, to = to, xlim = xlim,
+                    xlab = xlab, ylab = ylab, main = main, n = n, ...)
+
+      invisible(list(
+        x = temp$x,
+        y = temp$y,
+        xlab = xlab,
+        ylab = ylab,
+        main = main
+      ))
     }
   )
 )

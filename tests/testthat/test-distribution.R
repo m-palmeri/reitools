@@ -335,44 +335,94 @@ test_that("UniformDistribution functionality testing", {
 })
 
 
-### graph method testing ------------------------------------------------------
+### graphing method testing ---------------------------------------------------
 
-test_that("graph method parameters checks work as expected", {
+test_that("plot method works as expected", {
   normal_dist <- NormalDistribution$new(
     mean = 0,
     sd = 1
   )
 
-  expect_error(
-    normal_dist$graph(graph_method = "test"),
-    "graph method 'test' not supported."
+  from <- -4
+  to <- 4
+  n <- 1000
+  xlab <- "xtest"
+  ylab <- "ytest"
+  main <- "main test"
+
+  pdf(NULL)
+  comp <- plot(dnorm, from, to, n = n)
+  p <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
+
+  expect_equal(
+    p$x,
+    comp$x
+  )
+  expect_equal(
+    p$y,
+    comp$y
   )
 
-  expect_error(
-    normal_dist$graph(xlim = 1),
-    "xlim parameter should be of length 2"
+  # parameter checks
+  expect_equal(
+    p$x[1],
+    from
   )
-
-  expect_error(
-    normal_dist$graph(xlim = c("a", 1)),
-    "xlim parameter should be numeric"
+  expect_equal(
+    p$x[n],
+    to
   )
-  expect_error(
-    normal_dist$graph(xlim = c(1, "a")),
-    "xlim parameter should be numeric"
+  expect_equal(
+    p$xlab,
+    xlab
   )
-
-  expect_error(
-    normal_dist$graph(N = "a"),
-    "N parameter should be numeric"
+  expect_equal(
+    p$ylab,
+    ylab
+  )
+  expect_equal(
+    p$main,
+    main
   )
 })
 
-test_that("graph.base works as expected", {
+test_that("snapshot tests for plot method", {
+  vdiffr::expect_doppelganger(
+    "Normal Distribution graph method",
+    NormalDistribution$new(
+      mean = 5,
+      sd = 2
+    )$plot()
+  )
 
+  vdiffr::expect_doppelganger(
+    "Beta Distribution graph method",
+    BetaDistribution$new(
+      shape1 = 1,
+      shape2 = 3
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Gamma Distribution graph method",
+    GammaDistribution$new(
+      shape = 2,
+      rate = 2
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Exponential Distribution graph method",
+    ExponentialDistribution$new(
+      rate = 3
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Uniform Distribution graph method",
+    UniformDistribution$new(
+      min = 0,
+      max = 3
+    )$plot()
+  )
 })
-
-test_that("graph.ggplot2 works as expected", {
-
-})
-
