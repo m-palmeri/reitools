@@ -352,36 +352,41 @@ test_that("plot method works as expected", {
 
   pdf(NULL)
   comp <- plot(dnorm, from, to, n = n)
-  p <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
+  p1 <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
+  p2 <- plot(normal_dist, from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
 
   expect_equal(
-    p$x,
+    p1$x,
     comp$x
   )
   expect_equal(
-    p$y,
+    p1$y,
     comp$y
+  )
+  expect_equal(
+    p1,
+    p2
   )
 
   # parameter checks
   expect_equal(
-    p$x[1],
+    p1$x[1],
     from
   )
   expect_equal(
-    p$x[n],
+    p1$x[n],
     to
   )
   expect_equal(
-    p$xlab,
+    p1$xlab,
     xlab
   )
   expect_equal(
-    p$ylab,
+    p1$ylab,
     ylab
   )
   expect_equal(
-    p$main,
+    p1$main,
     main
   )
 })
