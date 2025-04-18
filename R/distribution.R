@@ -7,21 +7,29 @@ Distribution <- R6::R6Class(
       } else {
         stop("params is read-only. To change this, change the individual parameter fields")
       }
+    },
+
+    type = function(value) {
+      if (missing(value)) {
+        return(private$.type)
+      } else {
+        stop("type is read-only")
+      }
     }
   ),
   private = list(
     .params = list(),
-    type = character(),
+    .type = character(),
     pdf_function = NULL,
     cdf_function = NULL,
     quantile_function = NULL,
     randomizer_function = NULL,
 
     # check each parameter is just length one
-    check_length = function(param, name) {
+    check_length = function(param, name, expected_length = 1) {
       assertthat::assert_that(
-        length(param) == 1,
-        msg = glue::glue("{name} parameter should be of length 1")
+        length(param) == expected_length,
+        msg = glue::glue("{name} parameter should be of length {expected_length}")
       )
     },
 
@@ -72,6 +80,43 @@ Distribution <- R6::R6Class(
       args <- append(list(n), private$.params)
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
+    },
+
+    plot = function(to = NULL,
+                    from = NULL,
+                    xlim = NULL,
+                    xlab = NULL,
+                    ylab = NULL,
+                    main = NULL,
+                    n = 100,
+                    ...) {
+      if (self$type == "beta" && is.null(xlim)) {
+        from <- from %||% 0
+        to <- to %||% 1
+      } else if (is.null(xlim)) {
+        from <- from %||% self$quantile(0.001)
+        to <- to %||% self$quantile(0.999)
+      } else {
+        from <- from %||% xlim[1]
+        to <- to %||% xlim[2]
+      }
+
+      xlab <- xlab %||% "x"
+      ylab <- ylab %||% "PDF"
+      main <- main %||% paste(tools::toTitleCase(self$type), "Distribution")
+
+      pdf_function <- self$pdf
+
+      temp <- curve(expr = pdf_function, from = from, to = to, xlim = xlim,
+                    xlab = xlab, ylab = ylab, main = main, n = n, ...)
+
+      invisible(list(
+        x = temp$x,
+        y = temp$y,
+        xlab = xlab,
+        ylab = ylab,
+        main = main
+      ))
     }
   )
 )
@@ -101,7 +146,7 @@ NormalDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "normal"
+    .type = "normal"
   ),
   public = list(
     initialize = function(mean, sd) {
@@ -142,7 +187,7 @@ BetaDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "beta"
+    .type = "beta"
   ),
   public = list(
     initialize = function(shape1, shape2) {
@@ -183,7 +228,7 @@ GammaDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "gamma"
+    .type = "gamma"
   ),
   public = list(
     initialize = function(shape, rate) {
@@ -214,7 +259,7 @@ ExponentialDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "exponential"
+    .type = "exponential"
   ),
   public = list(
     initialize = function(rate) {
@@ -253,7 +298,7 @@ UniformDistribution <- R6::R6Class(
     }
   ),
   private = list(
-    type = "uniform"
+    .type = "uniform"
   ),
   public = list(
     initialize = function(min, max) {

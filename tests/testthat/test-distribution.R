@@ -335,3 +335,94 @@ test_that("UniformDistribution functionality testing", {
 })
 
 
+### graphing method testing ---------------------------------------------------
+
+test_that("plot method works as expected", {
+  normal_dist <- NormalDistribution$new(
+    mean = 0,
+    sd = 1
+  )
+
+  from <- -4
+  to <- 4
+  n <- 1000
+  xlab <- "xtest"
+  ylab <- "ytest"
+  main <- "main test"
+
+  pdf(NULL)
+  comp <- plot(dnorm, from, to, n = n)
+  p <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
+
+  expect_equal(
+    p$x,
+    comp$x
+  )
+  expect_equal(
+    p$y,
+    comp$y
+  )
+
+  # parameter checks
+  expect_equal(
+    p$x[1],
+    from
+  )
+  expect_equal(
+    p$x[n],
+    to
+  )
+  expect_equal(
+    p$xlab,
+    xlab
+  )
+  expect_equal(
+    p$ylab,
+    ylab
+  )
+  expect_equal(
+    p$main,
+    main
+  )
+})
+
+test_that("snapshot tests for plot method", {
+  vdiffr::expect_doppelganger(
+    "Normal Distribution graph method",
+    NormalDistribution$new(
+      mean = 5,
+      sd = 2
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Beta Distribution graph method",
+    BetaDistribution$new(
+      shape1 = 1,
+      shape2 = 3
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Gamma Distribution graph method",
+    GammaDistribution$new(
+      shape = 2,
+      rate = 2
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Exponential Distribution graph method",
+    ExponentialDistribution$new(
+      rate = 3
+    )$plot()
+  )
+
+  vdiffr::expect_doppelganger(
+    "Uniform Distribution graph method",
+    UniformDistribution$new(
+      min = 0,
+      max = 3
+    )$plot()
+  )
+})
