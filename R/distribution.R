@@ -120,7 +120,7 @@ Distribution <- R6::R6Class(
 
       xlab <- xlab %||% "x"
       ylab <- ylab %||% "PDF"
-      main <- main %||% paste(tools::toTitleCase(self$type), "Distribution")
+      main <- main %||% private$.print()
 
       pdf_function <- self$pdf
 
