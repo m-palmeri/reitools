@@ -2,7 +2,7 @@ Package: reitools
 Title: Tools for Real Estate Investment Analysis
 Version: 0.0.1
 Authors@R: 
-    person ("Matthew", "Palmeri", "matthew.thomas.palmeri@gmail.com", role = c("aut", "cre"))
+    person("Matthew", "Palmeri", "matthew.thomas.palmeri@gmail.com", role = c("aut", "cre"))
 Description: Fast and consistent analysis tools for all types of real estate 
     investment strategies.
 License: MIT + file LICENSE
@@ -10,5 +10,10 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    vdiffr,
+    withr
 Config/testthat/edition: 3
+Imports: 
+    purrr,
+    R6
