@@ -352,36 +352,41 @@ test_that("plot method works as expected", {
 
   pdf(NULL)
   comp <- plot(dnorm, from, to, n = n)
-  p <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
+  p1 <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
+  p2 <- plot(normal_dist, from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
 
   expect_equal(
-    p$x,
+    p1$x,
     comp$x
   )
   expect_equal(
-    p$y,
+    p1$y,
     comp$y
+  )
+  expect_equal(
+    p1,
+    p2
   )
 
   # parameter checks
   expect_equal(
-    p$x[1],
+    p1$x[1],
     from
   )
   expect_equal(
-    p$x[n],
+    p1$x[n],
     to
   )
   expect_equal(
-    p$xlab,
+    p1$xlab,
     xlab
   )
   expect_equal(
-    p$ylab,
+    p1$ylab,
     ylab
   )
   expect_equal(
-    p$main,
+    p1$main,
     main
   )
 })
@@ -424,5 +429,58 @@ test_that("snapshot tests for plot method", {
       min = 0,
       max = 3
     )$plot()
+  )
+})
+
+
+### print method testing ------------------------------------------------------
+
+test_that("print method works as expected", {
+  normal_dist <- NormalDistribution$new(
+    mean = 2,
+    sd = 1
+  )
+  expect_output(
+    normal_dist$print(),
+    "Normal Distribution \\(mean = 2, sd = 1\\)"
+  )
+  expect_output(
+    print(normal_dist),
+    "Normal Distribution \\(mean = 2, sd = 1\\)"
+  )
+
+  beta_dist <- BetaDistribution$new(
+    shape1 = 5,
+    shape2 = 2
+  )
+  expect_output(
+    print(beta_dist),
+    "Beta Distribution \\(shape1 = 5, shape2 = 2\\)"
+  )
+
+  gamma_dist <- GammaDistribution$new(
+    shape = 2,
+    rate = 5
+  )
+  expect_output(
+    print(gamma_dist),
+    "Gamma Distribution \\(shape = 2, rate = 5\\)"
+  )
+
+  exp_dist <- ExponentialDistribution$new(
+    rate = 2
+  )
+  expect_output(
+    print(exp_dist),
+    "Exponential Distribution \\(rate = 2\\)"
+  )
+
+  uniform_dist <- UniformDistribution$new(
+    min = 2,
+    max = 100
+  )
+  expect_output(
+    print(uniform_dist),
+    "Uniform Distribution \\(min = 2, max = 100\\)"
   )
 })
