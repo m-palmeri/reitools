@@ -5,16 +5,20 @@ Scenario <- R6::R6Class(
       if (missing(value)) {
 
       } else {
-        stop("incomes is read-only. Use add_item, update_item, or remove_item",
-             " methods to adjust this")
+        stop(
+          "incomes is read-only. Use add_item, update_item, or remove_item",
+          " methods to adjust this"
+        )
       }
     },
     expenses = function(value) {
       if (missing(value)) {
 
       } else {
-        stop("expenses is read-only. Use add_item, update_item, or remove_item",
-             " methods to adjust this")
+        stop(
+          "expenses is read-only. Use add_item, update_item, or remove_item",
+          " methods to adjust this"
+        )
       }
     }
   ),
@@ -30,15 +34,12 @@ Scenario <- R6::R6Class(
         self$add_item(name, x)
       })
     },
-
     add_item <- function(name, value) {
       private$items[[name]] <- value
     },
-
     update_item <- function(name, new_value) {
 
     },
-
     remove_item <- function(name) {
 
     }

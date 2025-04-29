@@ -93,7 +93,6 @@ Distribution <- R6::R6Class(
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
     },
-
     plot = function(to = NULL,
                     from = NULL,
                     xlim = NULL,
