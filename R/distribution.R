@@ -8,7 +8,6 @@ Distribution <- R6::R6Class(
         stop("params is read-only. To change this, change the individual parameter fields")
       }
     },
-
     type = function(value) {
       if (missing(value)) {
         return(private$.type)
@@ -55,6 +54,22 @@ Distribution <- R6::R6Class(
         param < value,
         msg = glue::glue("{name} parameter must be lesser than {value}")
       )
+    },
+
+    # helper method for printing
+    .print = function(round_digits = 2) {
+      dist_text <- paste0(
+        tools::toTitleCase(self$type),
+        " Distribution ",
+        "(",
+        purrr::imap(private$.params, .f = function(x, i) {
+          paste(i, "=", round(x, round_digits))
+        }) %>%
+          unlist() %>%
+          toString(),
+        ")"
+      )
+      return(dist_text)
     }
   ),
   public = list(
@@ -63,25 +78,21 @@ Distribution <- R6::R6Class(
       value <- do.call(private$pdf_function, args)
       return(value)
     },
-
     cdf = function(x) {
       args <- append(list(x), private$.params)
       value <- do.call(private$cdf_function, args)
       return(value)
     },
-
     quantile = function(q) {
       args <- append(list(q), private$.params)
       value <- do.call(private$quantile_function, args)
       return(value)
     },
-
     random = function(n = 1, seed = 1) {
       args <- append(list(n), private$.params)
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
     },
-
     plot = function(to = NULL,
                     from = NULL,
                     xlim = NULL,
@@ -108,8 +119,10 @@ Distribution <- R6::R6Class(
 
       pdf_function <- self$pdf
 
-      temp <- curve(expr = pdf_function, from = from, to = to, xlim = xlim,
-                    xlab = xlab, ylab = ylab, main = main, n = n, ...)
+      temp <- curve(
+        expr = pdf_function, from = from, to = to, xlim = xlim,
+        xlab = xlab, ylab = ylab, main = main, n = n, ...
+      )
 
       if (testing) {
         return(NULL)
@@ -123,19 +136,8 @@ Distribution <- R6::R6Class(
         ))
       }
     },
-
-    print = function(round_digits = 2) {
-      dist_text <- paste0(
-        tools::toTitleCase(self$type),
-        " Distribution ",
-        "(",
-        purrr::imap(private$.params, .f = function(x, i) {
-          paste(i, "=", round(x, round_digits))
-        }) %>%
-          unlist() %>%
-          toString(),
-        ")"
-      )
+    print = function(...) {
+      private$.print(...)
 
       cat(dist_text)
     }
