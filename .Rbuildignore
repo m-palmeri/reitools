@@ -1,2 +1,6 @@
+^renv$
+^renv\.lock$
 ^reitools\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+^\.github$
