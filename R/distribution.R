@@ -129,7 +129,7 @@ Distribution <- R6::R6Class(
                     xlab = xlab, ylab = ylab, main = main, n = n, ...)
 
       if (testing) {
-        return(c())
+        return(NULL)
       } else {
         invisible(list(
           x = temp$x,
