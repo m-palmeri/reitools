@@ -8,7 +8,6 @@ Distribution <- R6::R6Class(
         stop("params is read-only. To change this, change the individual parameter fields")
       }
     },
-
     type = function(value) {
       if (missing(value)) {
         return(private$.type)
@@ -70,7 +69,6 @@ Distribution <- R6::R6Class(
           toString(),
         ")"
       )
-
       return(dist_text)
     }
   ),
@@ -80,19 +78,16 @@ Distribution <- R6::R6Class(
       value <- do.call(private$pdf_function, args)
       return(value)
     },
-
     cdf = function(x) {
       args <- append(list(x), private$.params)
       value <- do.call(private$cdf_function, args)
       return(value)
     },
-
     quantile = function(q) {
       args <- append(list(q), private$.params)
       value <- do.call(private$quantile_function, args)
       return(value)
     },
-
     random = function(n = 1, seed = 1) {
       args <- append(list(n), private$.params)
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
@@ -106,6 +101,7 @@ Distribution <- R6::R6Class(
                     ylab = NULL,
                     main = NULL,
                     n = 100,
+                    testing = FALSE,
                     ...) {
       if (self$type == "beta" && is.null(xlim)) {
         from <- from %||% 0
@@ -124,22 +120,27 @@ Distribution <- R6::R6Class(
 
       pdf_function <- self$pdf
 
-      temp <- curve(expr = pdf_function, from = from, to = to, xlim = xlim,
-                    xlab = xlab, ylab = ylab, main = main, n = n, ...)
+      temp <- curve(
+        expr = pdf_function, from = from, to = to, xlim = xlim,
+        xlab = xlab, ylab = ylab, main = main, n = n, ...
+      )
 
-      invisible(list(
-        x = temp$x,
-        y = temp$y,
-        xlab = xlab,
-        ylab = ylab,
-        main = main
-      ))
+      if (testing) {
+        return(NULL)
+      } else {
+        invisible(list(
+          x = temp$x,
+          y = temp$y,
+          xlab = xlab,
+          ylab = ylab,
+          main = main
+        ))
+      }
     },
-
     print = function(...) {
-      result <- private$.print(...)
+      dist_text <- private$.print(...)
 
-      cat(result)
+      cat(dist_text)
     }
   )
 )
