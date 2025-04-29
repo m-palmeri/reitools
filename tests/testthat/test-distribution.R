@@ -397,7 +397,7 @@ test_that("snapshot tests for plot method", {
     NormalDistribution$new(
       mean = 5,
       sd = 2
-    )$plot()
+    )$plot(testing = TRUE)
   )
 
   vdiffr::expect_doppelganger(
@@ -405,7 +405,7 @@ test_that("snapshot tests for plot method", {
     BetaDistribution$new(
       shape1 = 1,
       shape2 = 3
-    )$plot()
+    )$plot(testing = TRUE)
   )
 
   vdiffr::expect_doppelganger(
@@ -413,22 +413,22 @@ test_that("snapshot tests for plot method", {
     GammaDistribution$new(
       shape = 2,
       rate = 2
-    )$plot()
+    )$plot(testing = TRUE)
   )
 
   vdiffr::expect_doppelganger(
     "Exponential Distribution graph method",
     ExponentialDistribution$new(
       rate = 3
-    )$plot()
+    )$plot(testing = TRUE)
   )
 
   vdiffr::expect_doppelganger(
     "Uniform Distribution graph method",
-    UniformDistribution$new(
+    out <- UniformDistribution$new(
       min = 0,
       max = 3
-    )$plot()
+    )$plot(testing = TRUE)
   )
 })
 

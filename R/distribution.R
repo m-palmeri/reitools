@@ -106,6 +106,7 @@ Distribution <- R6::R6Class(
                     ylab = NULL,
                     main = NULL,
                     n = 100,
+                    testing = FALSE,
                     ...) {
       if (self$type == "beta" && is.null(xlim)) {
         from <- from %||% 0
@@ -127,13 +128,17 @@ Distribution <- R6::R6Class(
       temp <- curve(expr = pdf_function, from = from, to = to, xlim = xlim,
                     xlab = xlab, ylab = ylab, main = main, n = n, ...)
 
-      invisible(list(
-        x = temp$x,
-        y = temp$y,
-        xlab = xlab,
-        ylab = ylab,
-        main = main
-      ))
+      if (testing) {
+        return(c())
+      } else {
+        invisible(list(
+          x = temp$x,
+          y = temp$y,
+          xlab = xlab,
+          ylab = ylab,
+          main = main
+        ))
+      }
     },
 
     print = function(...) {
