@@ -55,23 +55,6 @@ Distribution <- R6::R6Class(
         param < value,
         msg = glue::glue("{name} parameter must be lesser than {value}")
       )
-    },
-
-    # helper method for printing
-    .print = function(round_digits = 2) {
-      dist_text <- paste0(
-        tools::toTitleCase(self$type),
-        " Distribution ",
-        "(",
-        purrr::imap(private$.params, .f = function(x, i) {
-          paste(i, "=", round(x, round_digits))
-        }) %>%
-          unlist() %>%
-          toString(),
-        ")"
-      )
-
-      return(dist_text)
     }
   ),
   public = list(
@@ -141,10 +124,20 @@ Distribution <- R6::R6Class(
       }
     },
 
-    print = function(...) {
-      result <- private$.print(...)
+    print = function(round_digits = 2) {
+      dist_text <- paste0(
+        tools::toTitleCase(self$type),
+        " Distribution ",
+        "(",
+        purrr::imap(private$.params, .f = function(x, i) {
+          paste(i, "=", round(x, round_digits))
+        }) %>%
+          unlist() %>%
+          toString(),
+        ")"
+      )
 
-      cat(result)
+      cat(dist_text)
     }
   )
 )
