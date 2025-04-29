@@ -137,7 +137,7 @@ Distribution <- R6::R6Class(
       }
     },
     print = function(...) {
-      private$.print(...)
+      dist_text <- private$.print(...)
 
       cat(dist_text)
     }
