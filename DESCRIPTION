@@ -19,9 +19,8 @@ Suggests:
     withr
 Config/testthat/edition: 3
 Imports: 
-    assertthat,
-    checkmate,
     purrr,
-    R6
+    R6,
+    rlang
 URL: https://github.com/m-palmeri/reitools
 BugReports: https://github.com/m-palmeri/reitools/issues
