@@ -269,7 +269,9 @@ check_number_whole <- function(
     allow_na,
     allow_null,
     arg,
-    call
+    call,
+    min_override = NULL,
+    max_override = NULL
 ) {
   if (allow_decimal) {
     what <- "a number"
@@ -278,8 +280,8 @@ check_number_whole <- function(
   }
 
   if (exit_code == 2) {
-    min <- min %||% -Inf
-    max <- max %||% Inf
+    min <- min_override %||% min %||% -Inf
+    max <- max_override %||% max %||% Inf
 
     if (min > -Inf && max < Inf) {
       what <- sprintf("%s between %s and %s", what, min, max)
