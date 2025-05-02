@@ -43,19 +43,16 @@ Distribution <- R6::R6Class(
   ),
   public = list(
     pdf = function(x) {
-      check_number_decimal(x)
       args <- append(list(x), private$.params)
       value <- do.call(private$pdf_function, args)
       return(value)
     },
     cdf = function(x) {
-      check_number_decimal(x)
       args <- append(list(x), private$.params)
       value <- do.call(private$cdf_function, args)
       return(value)
     },
     quantile = function(q) {
-      check_number_decimal(q, min = 0, max = 1)
       args <- append(list(q), private$.params)
       value <- do.call(private$quantile_function, args)
       return(value)
@@ -78,7 +75,7 @@ Distribution <- R6::R6Class(
                     testing = FALSE,
                     ...) {
       check_number_decimal(to, allow_null = TRUE)
-      check_number_decimal(from, allow_NULL = TRUE)
+      check_number_decimal(from, allow_null = TRUE)
       if (!is.null(xlim) && length(xlim) != 2) {
         stop_input_type(
           xlim,
@@ -292,7 +289,7 @@ UniformDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$max)
       } else {
-        check_number_decimal(value, min = self$min, arg = "max")
+        check_number_decimal(value, min = self$min, arg = "max", min_override = "min")
         private$.params$max <- value
       }
     }

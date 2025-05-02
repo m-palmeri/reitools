@@ -3,25 +3,24 @@
 test_that("NormalDistribution testing initiation and param checks", {
   expect_error(
     NormalDistribution$new(mean = c(1, 2), sd = 1),
-    "mean parameter should be of length 1"
+    "`mean` must be a number, not a double vector"
   )
   expect_error(
-    NormalDistribution$new(mean = 1, sd = c(1, 2)),
-    "sd parameter should be of length 1"
+    NormalDistribution$new(mean = "b", sd = 1),
+    "`mean` must be a number"
   )
 
   expect_error(
-    NormalDistribution$new(mean = "b", sd = 1),
-    "mean parameter should be numeric"
+    NormalDistribution$new(mean = 1, sd = c(1, 2)),
+    "`sd` must be a number, not a double vector"
   )
   expect_error(
     NormalDistribution$new(mean = 1, sd = "a"),
-    "sd parameter should be numeric"
+    "`sd` must be a number"
   )
-
   expect_error(
-    NormalDistribution$new(mean = 1, sd = 0),
-    "sd parameter must be greater than 0"
+    NormalDistribution$new(mean = 1, sd = -1),
+    "`sd` must be a number larger than or equal to 0"
   )
 })
 
@@ -69,29 +68,28 @@ test_that("NormalDistribution functionality testing", {
 test_that("BetaDistribution testing initiation and param checks", {
   expect_error(
     BetaDistribution$new(shape1 = c(1, 2), shape2 = 1),
-    "shape1 parameter should be of length 1"
+    "`shape1` must be a number"
   )
   expect_error(
-    BetaDistribution$new(shape1 = 1, shape2 = c(1, 2)),
-    "shape2 parameter should be of length 1"
+    BetaDistribution$new(shape1 = "b", shape2 = 1),
+    "`shape1` must be a number"
+  )
+  expect_error(
+    BetaDistribution$new(shape1 = -1, shape2 = 1),
+    "`shape1` must be a number larger than or equal to 0"
   )
 
   expect_error(
-    BetaDistribution$new(shape1 = "b", shape2 = 1),
-    "shape1 parameter should be numeric"
+    BetaDistribution$new(shape1 = 1, shape2 = c(1, 2)),
+    "`shape2` must be a number"
   )
   expect_error(
     BetaDistribution$new(shape1 = 1, shape2 = "a"),
-    "shape2 parameter should be numeric"
-  )
-
-  expect_error(
-    BetaDistribution$new(shape1 = 0, shape2 = 1),
-    "shape1 parameter must be greater than 0"
+    "`shape2` must be a number"
   )
   expect_error(
-    BetaDistribution$new(shape1 = 1, shape2 = 0),
-    "shape2 parameter must be greater than 0"
+    BetaDistribution$new(shape1 = 1, shape2 = -0.5),
+    "`shape2` must be a number larger than or equal to 0"
   )
 })
 
@@ -138,29 +136,28 @@ test_that("BetaDistribution functionality testing", {
 test_that("GammaDistribution testing initiation and param checks", {
   expect_error(
     GammaDistribution$new(shape = c(1, 2), rate = 1),
-    "shape parameter should be of length 1"
+    "`shape` must be a number"
   )
   expect_error(
-    GammaDistribution$new(shape = 1, rate = c(1, 2)),
-    "rate parameter should be of length 1"
+    GammaDistribution$new(shape = "b", rate = 1),
+    "`shape` must be a number"
+  )
+  expect_error(
+    GammaDistribution$new(shape = -1, rate = 1),
+    "`shape` must be a number larger than or equal to 0"
   )
 
   expect_error(
-    GammaDistribution$new(shape = "b", rate = 1),
-    "shape parameter should be numeric"
+    GammaDistribution$new(shape = 1, rate = c(1, 2)),
+    "`rate` must be a number"
   )
   expect_error(
     GammaDistribution$new(shape = 1, rate = "a"),
-    "rate parameter should be numeric"
-  )
-
-  expect_error(
-    GammaDistribution$new(shape = 0, rate = 1),
-    "shape parameter must be greater than 0"
+    "`rate` must be a number"
   )
   expect_error(
-    GammaDistribution$new(shape = 1, rate = 0),
-    "rate parameter must be greater than 0"
+    GammaDistribution$new(shape = 1, rate = -1),
+    "`rate` must be a number larger than or equal to 0"
   )
 })
 
@@ -208,17 +205,17 @@ test_that("GammaDistribution functionality testing", {
 test_that("ExponentialDistribution testing initiation and param checks", {
   expect_error(
     ExponentialDistribution$new(rate = c(1, 2)),
-    "rate parameter should be of length 1"
+    "`rate` must be a number"
   )
 
   expect_error(
     ExponentialDistribution$new(rate = "b"),
-    "rate parameter should be numeric"
+    "`rate` must be a number"
   )
 
   expect_error(
-    ExponentialDistribution$new(rate = 0),
-    "rate parameter must be greater than 0"
+    ExponentialDistribution$new(rate = -1),
+    "`rate` must be a number larger than or equal to 0"
   )
 })
 
@@ -264,29 +261,28 @@ test_that("ExponentialDistribution functionality testing", {
 test_that("UniformDistribution testing initiation and param checks", {
   expect_error(
     UniformDistribution$new(min = c(1, 2), max = 1),
-    "min parameter should be of length 1"
+    "`min` must be a number"
   )
   expect_error(
-    UniformDistribution$new(min = 1, max = c(1, 2)),
-    "max parameter should be of length 1"
+    UniformDistribution$new(min = "b", max = 1),
+    "`min` must be a number"
   )
 
   expect_error(
-    UniformDistribution$new(min = "b", max = 1),
-    "min parameter should be numeric"
+    UniformDistribution$new(min = 1, max = c(1, 2)),
+    "`max` must be a number"
   )
   expect_error(
     UniformDistribution$new(min = 1, max = "a"),
-    "max parameter should be numeric"
+    "`max` must be a number"
   )
-
   expect_error(
     UniformDistribution$new(min = 0, max = -1),
-    "max parameter must be greater than 0"
+    "`max` must be a number larger than or equal to min"
   )
   expect_error(
     UniformDistribution$new(min = 10, max = 5),
-    "max parameter must be greater than 10"
+    "`max` must be a number larger than or equal to min"
   )
 })
 
