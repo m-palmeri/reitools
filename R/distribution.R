@@ -24,40 +24,9 @@ Distribution <- R6::R6Class(
     quantile_function = NULL,
     randomizer_function = NULL,
 
-    # check each parameter is just length one
-    check_length = function(param, name, expected_length = 1) {
-      assertthat::assert_that(
-        length(param) == expected_length,
-        msg = glue::glue("{name} parameter should be of length {expected_length}")
-      )
-    },
-
-    # check that parameter value is numeric
-    check_numeric = function(param, name) {
-      assertthat::assert_that(
-        is.numeric(param),
-        msg = glue::glue("{name} parameter should be numeric")
-      )
-    },
-
-    # check that parameter value is greater than a minimum value
-    check_greater_than = function(param, name, value) {
-      assertthat::assert_that(
-        param > value,
-        msg = glue::glue("{name} parameter must be greater than {value}")
-      )
-    },
-
-    # check that parameter value is greater than a minimum value
-    check_lesser_than = function(param, name, value) {
-      assertthat::assert_that(
-        param < value,
-        msg = glue::glue("{name} parameter must be lesser than {value}")
-      )
-    },
-
     # helper method for printing
     .print = function(round_digits = 2) {
+      check_number_whole(round_digits)
       dist_text <- paste0(
         tools::toTitleCase(self$type),
         " Distribution ",
@@ -74,21 +43,26 @@ Distribution <- R6::R6Class(
   ),
   public = list(
     pdf = function(x) {
+      check_number_decimal(x)
       args <- append(list(x), private$.params)
       value <- do.call(private$pdf_function, args)
       return(value)
     },
     cdf = function(x) {
+      check_number_decimal(x)
       args <- append(list(x), private$.params)
       value <- do.call(private$cdf_function, args)
       return(value)
     },
     quantile = function(q) {
+      check_number_decimal(q, min = 0, max = 1)
       args <- append(list(q), private$.params)
       value <- do.call(private$quantile_function, args)
       return(value)
     },
     random = function(n = 1, seed = 1) {
+      check_number_whole(n)
+      check_number_decimal(seed)
       args <- append(list(n), private$.params)
       value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
       return(value)
@@ -103,6 +77,24 @@ Distribution <- R6::R6Class(
                     n = 100,
                     testing = FALSE,
                     ...) {
+      check_number_decimal(to, allow_null = TRUE)
+      check_number_decimal(from, allow_NULL = TRUE)
+      if (!is.null(xlim) && length(xlim) != 2) {
+        stop_input_type(
+          xlim,
+          "a numeric vector of length 2",
+          arg = rlang::caller_arg(x),
+          call = rlang::caller_env()
+        )
+      }
+      check_number_decimal(xlim[1], allow_null = TRUE)
+      check_number_decimal(xlim[2], allow_null = TRUE)
+      check_character(xlab, allow_null = TRUE)
+      check_character(ylab, allow_null = TRUE)
+      check_character(main, allow_null = TRUE)
+      check_number_whole(n, min = 50)
+      check_bool(testing)
+
       if (self$type == "beta" && is.null(xlim)) {
         from <- from %||% 0
         to <- to %||% 1
@@ -153,8 +145,7 @@ NormalDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$mean)
       } else {
-        private$check_length(value, "mean")
-        private$check_numeric(value, "mean")
+        check_number_decimal(value, arg = "mean")
         private$.params$mean <- value
       }
     },
@@ -162,9 +153,7 @@ NormalDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$sd)
       } else {
-        private$check_length(value, "sd")
-        private$check_numeric(value, "sd")
-        private$check_greater_than(value, "sd", 0)
+        check_number_decimal(value, min = 0, arg = "sd")
         private$.params$sd <- value
       }
     }
@@ -193,9 +182,7 @@ BetaDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$shape1)
       } else {
-        private$check_length(value, "shape1")
-        private$check_numeric(value, "shape1")
-        private$check_greater_than(value, "shape1", 0)
+        check_number_decimal(value, min = 0, arg = "shape1")
         private$.params$shape1 <- value
       }
     },
@@ -203,9 +190,7 @@ BetaDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$shape2)
       } else {
-        private$check_length(value, "shape2")
-        private$check_numeric(value, "shape2")
-        private$check_greater_than(value, "shape2", 0)
+        check_number_decimal(value, min = 0, arg = "shape2")
         private$.params$shape2 <- value
       }
     }
@@ -234,9 +219,7 @@ GammaDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$shape)
       } else {
-        private$check_length(value, "shape")
-        private$check_numeric(value, "shape")
-        private$check_greater_than(value, "shape", 0)
+        check_number_decimal(value, min = 0, arg = "shape")
         private$.params$shape <- value
       }
     },
@@ -244,9 +227,7 @@ GammaDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$rate)
       } else {
-        private$check_length(value, "rate")
-        private$check_numeric(value, "rate")
-        private$check_greater_than(value, "rate", 0)
+        check_number_decimal(value, min = 0, arg = "rate")
         private$.params$rate <- value
       }
     }
@@ -275,9 +256,7 @@ ExponentialDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$rate)
       } else {
-        private$check_length(value, "rate")
-        private$check_numeric(value, "rate")
-        private$check_greater_than(value, "rate", 0)
+        check_number_decimal(value, min = 0, arg = "rate")
         private$.params$rate <- value
       }
     }
@@ -305,8 +284,7 @@ UniformDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$min)
       } else {
-        private$check_length(value, "min")
-        private$check_numeric(value, "min")
+        check_number_decimal(value, arg = "min")
         private$.params$min <- value
       }
     },
@@ -314,9 +292,7 @@ UniformDistribution <- R6::R6Class(
       if (missing(value)) {
         return(private$.params$max)
       } else {
-        private$check_length(value, "max")
-        private$check_numeric(value, "max")
-        private$check_greater_than(value, "max", self$min)
+        check_number_decimal(value, min = self$min, arg = "max")
         private$.params$max <- value
       }
     }
