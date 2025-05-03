@@ -85,9 +85,9 @@ Distribution <- R6::R6Class(
       }
       check_number_decimal(xlim[1], allow_null = TRUE)
       check_number_decimal(xlim[2], allow_null = TRUE)
-      check_character(xlab, allow_null = TRUE)
-      check_character(ylab, allow_null = TRUE)
-      check_character(main, allow_null = TRUE)
+      check_string(xlab, allow_null = TRUE)
+      check_string(ylab, allow_null = TRUE)
+      check_string(main, allow_null = TRUE)
       check_number_whole(n, min = 50)
       check_bool(testing)
 
