@@ -35,13 +35,29 @@ Scenario <- R6::R6Class(
       })
     },
     add_item <- function(name, value) {
+      check_character(name)
+      check_number_decimal(value)
+
       private$items[[name]] <- value
     },
     update_item <- function(name, new_value) {
+      check_character(name)
+      check_number_decimal(new_value)
+      if (!(name %in% names(private$items))) {
+        stop_input_type(
+          name,
+          "",
+          arg = rlang::caller_arg(name),
+          call = rlang::caller_env()
+        )
+      }
 
+      private$items[[name]] <- new_value
     },
     remove_item <- function(name) {
+      check_character(name)
 
+      private$items[[name]] <- NULL
     }
   )
 )
