@@ -3,22 +3,18 @@ Scenario <- R6::R6Class(
   active = list(
     incomes = function(value) {
       if (missing(value)) {
-
+        Filter(function(x) x > 0, private$items)
       } else {
-        stop(
-          "incomes is read-only. Use add_item, update_item, or remove_item",
-          " methods to adjust this"
-        )
+        stop("incomes is read-only. Use add_item, update_item, or remove_item",
+             " methods to adjust this")
       }
     },
     expenses = function(value) {
       if (missing(value)) {
-
+        Filter(function(x) x < 0, private$items)
       } else {
-        stop(
-          "expenses is read-only. Use add_item, update_item, or remove_item",
-          " methods to adjust this"
-        )
+        stop("expenses is read-only. Use add_item, update_item, or remove_item",
+             " methods to adjust this")
       }
     }
   ),
@@ -34,28 +30,44 @@ Scenario <- R6::R6Class(
         self$add_item(name, x)
       })
     },
-    add_item <- function(name, value) {
-      check_character(name)
+
+    add_item = function(name, value) {
+      check_string(name)
       check_number_decimal(value)
+      if (name %in% names(private$items)) {
+        rlang::abort(sprintf(
+          "`name` must not be an already defined expense or income. \n    -%s \n    -%s",
+          paste("defined incomes:", toString(names(self$incomes))),
+          paste("defined expenses:", toString(names(self$expenses)))
+        ))
+      }
 
       private$items[[name]] <- value
     },
-    update_item <- function(name, new_value) {
-      check_character(name)
+
+    update_item = function(name, new_value) {
+      check_string(name)
       check_number_decimal(new_value)
       if (!(name %in% names(private$items))) {
-        stop_input_type(
-          name,
-          "",
-          arg = rlang::caller_arg(name),
-          call = rlang::caller_env()
-        )
+        rlang::abort(sprintf(
+          "`name` must be an already defined expense or income. \n    -%s \n    -%s",
+          paste("defined incomes:", toString(names(self$incomes))),
+          paste("defined expenses:", toString(names(self$expenses)))
+        ))
       }
 
       private$items[[name]] <- new_value
     },
-    remove_item <- function(name) {
-      check_character(name)
+
+    remove_item = function(name) {
+      check_string(name)
+      if (!(name %in% names(private$items))) {
+        rlang::abort(sprintf(
+          "`name` must be an already defined expense or income. \n    -%s \n    -%s",
+          paste("defined incomes:", toString(names(self$incomes))),
+          paste("defined expenses:", toString(names(self$expenses)))
+        ))
+      }
 
       private$items[[name]] <- NULL
     }
