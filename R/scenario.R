@@ -69,6 +69,7 @@ Scenario <- R6::R6Class(
         ))
       }
 
+
       private$items[[name]] <- NULL
     }
   )
