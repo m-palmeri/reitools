@@ -1,14 +1,22 @@
 test_that("testing initialization and active fields", {
-  test1 <- make_fake_scenario()
-
+  test1 <- Scenario$new(
+    "income1" = 150,
+    "expense2" = -300,
+    "expense1" = -50,
+    "income2" = 500,
+    "income3" = 200
+  )
   expect_equal(
     names(test1$incomes),
     c("income1", "income2", "income3")
   )
-
   expect_equal(
     names(test1$expenses),
     c("expense2", "expense1")
+  )
+  expect_equal(
+    test1$profit,
+    500
   )
 })
 

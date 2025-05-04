@@ -16,6 +16,13 @@ Scenario <- R6::R6Class(
         stop("expenses is read-only. Use add_item, update_item, or remove_item",
              " methods to adjust this")
       }
+    },
+    profit = function(value) {
+      if (missing(value)) {
+        sum(unlist(private$items))
+      } else {
+        stop("cash_flow is read-only.")
+      }
     }
   ),
   private = list(
