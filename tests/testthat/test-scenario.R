@@ -1,11 +1,5 @@
 test_that("testing initialization and active fields", {
-  test1 <- Scenario$new(
-    "income1" = 100,
-    "expense2" = -249,
-    "expense1" = -100,
-    "income2" = 250,
-    "income3" = 200
-  )
+  test1 <- make_fake_scenario()
 
   expect_equal(
     names(test1$incomes),
@@ -20,13 +14,7 @@ test_that("testing initialization and active fields", {
 
 
 test_that("add_item, update_item, and remove_item method testing", {
-  test1 <- Scenario$new(
-    "income1" = 100,
-    "expense2" = -249,
-    "expense1" = -100,
-    "income2" = 250,
-    "income3" = 200
-  )
+  test1 <- make_fake_scenario()
 
   # add_item checks
   expect_error(
