@@ -19,6 +19,7 @@ Suggests:
     withr
 Config/testthat/edition: 3
 Imports: 
+    glue,
     purrr,
     R6,
     rlang
