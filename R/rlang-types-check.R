@@ -624,4 +624,32 @@ check_list <- function(
   )
 }
 
+# custom R6 ---------------------------------------------------------------
+
+check_distribution <- function(
+    x,
+    ...,
+    allow_null = FALSE,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+) {
+  if (!missing(x)) {
+    if ("Distribution" %in% class(x)) {
+      return(invisible(NULL))
+    }
+    if (allow_null && rlang::is_null(x)) {
+      return(invisible(NULL))
+    }
+  }
+
+  stop_input_type(
+    x,
+    "a distribution",
+    ...,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
 # nocov end
