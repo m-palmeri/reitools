@@ -133,8 +133,8 @@ Distribution <- R6::R6Class(
   )
 )
 
-NormalDistribution <- R6::R6Class(
-  classname = "NormalDistribution",
+DistributionNormal <- R6::R6Class(
+  classname = "DistributionNormal",
   inherit = Distribution,
   active = list(
     mean = function(value) {
@@ -170,8 +170,8 @@ NormalDistribution <- R6::R6Class(
   )
 )
 
-BetaDistribution <- R6::R6Class(
-  classname = "BetaDistribution",
+DistributionBeta <- R6::R6Class(
+  classname = "DistributionBeta",
   inherit = Distribution,
   active = list(
     shape1 = function(value) {
@@ -207,8 +207,8 @@ BetaDistribution <- R6::R6Class(
   )
 )
 
-GammaDistribution <- R6::R6Class(
-  classname = "GammaDistribution",
+DistributionGamma <- R6::R6Class(
+  classname = "DistributionGamma",
   inherit = Distribution,
   active = list(
     shape = function(value) {
@@ -244,8 +244,8 @@ GammaDistribution <- R6::R6Class(
   )
 )
 
-ExponentialDistribution <- R6::R6Class(
-  classname = "ExponentialDistribution",
+DistributionExponential <- R6::R6Class(
+  classname = "DistributionExponential",
   inherit = Distribution,
   active = list(
     rate = function(value) {
@@ -272,8 +272,8 @@ ExponentialDistribution <- R6::R6Class(
   )
 )
 
-UniformDistribution <- R6::R6Class(
-  classname = "UniformDistribution",
+DistributionUniform <- R6::R6Class(
+  classname = "DistributionUniform",
   inherit = Distribution,
   active = list(
     min = function(value) {
