@@ -57,11 +57,15 @@ Distribution <- R6::R6Class(
       value <- do.call(private$quantile_function, args)
       return(value)
     },
-    random = function(n = 1, seed = 1) {
+    random = function(n = 1, seed = NULL) {
       check_number_whole(n)
       check_number_decimal(seed)
       args <- append(list(n), private$.params)
-      value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
+      value <-ifelse(
+        is.null(seed),
+        do.call(private$randomizer_function, args),
+        withr::with_seed(seed, do.call(private$randomizer_function, args))
+      )
       return(value)
     },
     plot = function(to = NULL,
