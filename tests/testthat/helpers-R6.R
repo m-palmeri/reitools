@@ -1,17 +1,29 @@
 ### Helpers for Scenario testing
 
-make_fake_scenario <- function(incomes = 3, expenses = 2, seed = 123) {
-  items <- withr::with_seed(seed, {
-    income_list <- lapply(1:incomes, \(x) round(runif(1, 1, 1000)))
-    names(income_list) <- paste0("income", 1:incomes)
+make_fake_scenario <- function(monthly_income_count = 3,
+                               monthly_expense_count = 2,
+                               one_time_item_count = 5,
+                               seed = 123) {
+  monthly_items <- withr::with_seed(seed, {
+    income_list <- lapply(1:monthly_income_count, \(x) round(runif(1, 1, 1000)))
+    names(income_list) <- paste0("income", 1:monthly_income_count)
 
-    expense_list <- lapply(expenses:1, \(x) -round(runif(1, 1, 1000)))
-    names(expense_list) <- paste0("expense", expenses:1)
+    expense_list <- lapply(monthly_expense_count:1, \(x) -round(runif(1, 1, 1000)))
+    names(expense_list) <- paste0("expense", monthly_expense_count:1)
 
     append(income_list, expense_list)
   })
 
-  scenario <- do.call(Scenario$new, items)
+  one_time_items <- withr::with_seed(seed, {
+    temp <- lapply(1:one_time_item_count, \(x) round(runif(1, 1, 500000)))
+    names(temp) <- paste0("onetime", 1:one_time_item_count)
+    temp
+  })
+
+  scenario <- Scenario$new(
+    monthly_items = monthly_items,
+    one_time_items = one_time_items
+  )
   return(scenario)
 }
 
