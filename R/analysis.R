@@ -1,6 +1,20 @@
 Analysis <- R6::R6Class(
   classname = "Analysis",
   active = list(
+    onetime_costs = function(value) {
+      if (missing(value)) {
+        return(private$.onetime_costs)
+      } else {
+        check_list(value)
+        check_character(names(value), arg = "names(onetime_costs)")
+        purrr::walk(seq_along(value), function(i) {
+          name <- names(value)[i]
+          check_name(name, arg = glue::glue("names(onetime_costs)[{i}]"))
+          check_number_decimal(value[[i]], arg = glue::glue("onetime_costs${name}"))
+        })
+        private$.onetime_costs <- value
+      }
+    },
     fixed_costs = function(value) {
       if (missing(value)) {
         return(private$.fixed_costs)
@@ -31,9 +45,15 @@ Analysis <- R6::R6Class(
     }
   ),
   private = list(
+    .onetime_costs = list(),
     .fixed_costs = list(),
     .variable_costs = list(),
     simulation_N = 100000,
+    add_onetime_cost = function(value, name) {
+      check_name(name, arg = name)
+      check_number_decimal(value, arg = name)
+      self$onetime_costs[[name]] <- value
+    },
     add_fixed_cost = function(value, name) {
       check_name(name, arg = name)
       check_number_decimal(value, arg = name)
@@ -68,82 +88,72 @@ AnalysisBH <- R6::R6Class(
   active = list(
     purchase_price = function(value) {
       if (missing(value)) {
-        return(self$fixed_costs$purchase_price)
+        return(self$onetime_costs$purchase_price)
       } else {
-        check_number_decimal(value, arg = "purchase_price")
-        self$fixed_costs$purchase_price <- value
+        private$add_onetime_cost(value, "purchase_price")
       }
     },
     down_payment = function(value) {
       if (missing(value)) {
-        return(self$fixed_costs$down_payment)
+        return(self$onetime_costs$down_payment)
       } else {
-        check_number_decimal(value, arg = "down_payment")
-        self$fixed_costs$down_payment <- value
+        private$add_onetime_cost(value, "down_payment")
       }
     },
     mortgage_payment = function(value) {
       if (missing(value)) {
         return(self$fixed_costs$mortgage_payment)
       } else {
-        check_number_decimal(value, arg = "mortgage_payment")
-        self$fixed_costs$mortgage_payment <- value
+        private$add_fixed_cost(value, "mortgage_payment")
       }
     },
     rent = function(value) {
       if (missing(value)) {
         return(self$variable_costs$rent)
       } else {
-        check_distribution(value, arg = "rent")
-        self$variable_costs$rent <- value
+        private$add_variable_cost(value, "rent")
       }
     },
     property_taxes = function(value) {
       if (missing(value)) {
         return(self$variable_costs$property_taxes)
       } else {
-        check_distribution(value, arg = "property_taxes")
-        self$variable_costs$property_taxes <- value
+        private$add_variable_cost(value, "property_taxes")
       }
     },
     insurance = function(value) {
       if (missing(value)) {
         return(self$variable_costs$insurance)
       } else {
-        check_distribution(value, arg = "insurance")
-        self$variable_costs$insurance <- value
+        private$add_variable_cost(value, "insurance")
       }
     },
     maintenance = function(value) {
       if (missing(value)) {
         return(self$variable_costs$maintenance)
       } else {
-        check_distribution(value, arg = "maintenance")
-        self$variable_costs$maintenance <- value
+        private$add_variable_cost(value, "maintenance")
       }
     },
     vacancy = function(value) {
       if (missing(value)) {
         return(self$variable_costs$vacancy)
       } else {
-        check_distribution(value, arg = "vacancy")
-        self$variable_costs$vacancy <- value
+        private$add_variable_cost(value, "vacancy")
       }
     },
     capital_expenditures = function(value) {
       if (missing(value)) {
         return(self$variable_costs$capital_expenditures)
       } else {
-        check_distribution(value, arg = "capital_expenditures")
-        self$variable_costs$capital_expenditures <- value
+        private$add_variable_cost(value, "capital_expenditures")
       }
     },
     property_management = function(value) {
       if (missing(value)) {
         return(self$variable_costs$property_management)
       } else {
-        check_distribution(value, arg = "property_management")
-        self$variable_costs$property_management <- value
+        private$add_variable_cost(value, "property_management")
       }
     }
   ),
@@ -152,6 +162,14 @@ AnalysisBH <- R6::R6Class(
       scenario_params <- purrr::map(self$variable_costs, function(dist) {
         dist$random()
       })
+
+      onetime_items <- list(
+        purchase_price = self$purchase_price,
+        down_payment = self$down_payment
+      )
+      monthly_items <- append(
+        Filter(, self$fixed_costs)
+      )
     }
   ),
   public = list(
@@ -165,7 +183,8 @@ AnalysisBH <- R6::R6Class(
                           vacancy,
                           capital_expenditures,
                           property_management,
-                          fixed_monthly_extras = NULL,
+                          onetime_extras = NULL,
+                          fixed_extras = NULL,
                           variable_extras = NULL,
                           simulation_N = 100000) {
       self$purchase_price <- purchase_price
@@ -182,8 +201,11 @@ AnalysisBH <- R6::R6Class(
       check_number_whole(simulation_N)
       private$simulation_N <- simulation_N
 
-      check_list(fixed_monthly_extras, allow_null = TRUE)
-      purrr::iwalk(fixed_monthly_extras, private$add_fixed_cost)
+      check_list(onetime_extras, allow_null = TRUE)
+      purrr::iwalk(onetime_extras, private$add_onetime_cost)
+
+      check_list(fixed_extras, allow_null = TRUE)
+      purrr::iwalk(fixed_extras, private$add_fixed_cost)
 
       check_list(variable_extras, allow_null = TRUE)
       purrr::iwalk(variable_extras, private$add_variable_cost)

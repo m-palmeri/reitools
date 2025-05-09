@@ -186,11 +186,52 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
     mortgage_payment
   )
   expect_equal(
+    analysis_test$rent,
+    rent
+  )
+  expect_equal(
+    analysis_test$property_taxes,
+    property_taxes
+  )
+  expect_equal(
+    analysis_test$insurance,
+    insurance
+  )
+  expect_equal(
+    analysis_test$maintenance,
+    maintenance
+  )
+  expect_equal(
+    analysis_test$vacancy,
+    vacancy
+  )
+  expect_equal(
+    analysis_test$capital_expenditures,
+    capital_expenditures
+  )
+  expect_equal(
+    analysis_test$property_management,
+    property_management
+  )
+  expect_equal(
+    names(analysis_test$onetime_costs),
+    c("purchase_price", "down_payment")
+  )
+  expect_equal(
     names(analysis_test$fixed_costs),
-    c("purchase_price", "down_payment", "mortgage_payment")
+    c("mortgage_payment")
   )
   expect_equal(
     names(analysis_test$variable_costs),
-    c("vacancy", "rent")
+    c("rent", "property_taxes", "insurance", "maintenance", "vacancy",
+      "capital_expenditures", "property_management")
   )
+})
+
+test_that("AnalysisBH run_simulation testing", {
+  analysis_test <- make_fake_analysis(type = "AnalysisBH")
+})
+
+test_that("AnalysisBH testing onetime_extras, fixed_extras, and variable_extras", {
+
 })
