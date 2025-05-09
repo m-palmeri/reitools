@@ -52,7 +52,8 @@ Analysis <- R6::R6Class(
     run_simulation = function(N = self$simulation_N) {
       sim_results <- purrr::map(seq_len(N), function(i) {
         private$evaluate_scenario()
-      })
+      }) %>%
+        purrr::list_rbind()
 
       self$sim_results <- sim_results
 
@@ -144,11 +145,13 @@ AnalysisBH <- R6::R6Class(
         check_distribution(value, arg = "property_management")
         self$variable_costs$property_management <- value
       }
-    },
+    }
   ),
   private = list(
     evaluate_scenario = function() {
-
+      scenario_params <- purrr::map(self$variable_costs, function(dist) {
+        dist$random()
+      })
     }
   ),
   public = list(
@@ -173,14 +176,14 @@ AnalysisBH <- R6::R6Class(
       self$insurance <- insurance
       self$maintenance <- maintenance
       self$vacancy <- vacancy
-      self$capital_expenditure <- capital_expenditure
+      self$capital_expenditures <- capital_expenditures
       self$property_management <- property_management
 
       check_number_whole(simulation_N)
       private$simulation_N <- simulation_N
 
-      check_list(fixed_extras, allow_null = TRUE)
-      purrr::iwalk(fixed_extras, private$add_fixed_cost)
+      check_list(fixed_monthly_extras, allow_null = TRUE)
+      purrr::iwalk(fixed_monthly_extras, private$add_fixed_cost)
 
       check_list(variable_extras, allow_null = TRUE)
       purrr::iwalk(variable_extras, private$add_variable_cost)

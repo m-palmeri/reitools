@@ -170,6 +170,8 @@ DistributionNormal <- R6::R6Class(
       private$cdf_function <- stats::pnorm
       private$quantile_function <- stats::qnorm
       private$randomizer_function <- stats::rnorm
+
+      invisible(self)
     }
   )
 )
@@ -207,6 +209,8 @@ DistributionBeta <- R6::R6Class(
       private$cdf_function <- stats::pbeta
       private$quantile_function <- stats::qbeta
       private$randomizer_function <- stats::rbeta
+
+      invisible(self)
     }
   )
 )
@@ -244,6 +248,8 @@ DistributionGamma <- R6::R6Class(
       private$cdf_function <- stats::pgamma
       private$quantile_function <- stats::qgamma
       private$randomizer_function <- stats::rgamma
+
+      invisible(self)
     }
   )
 )
@@ -272,6 +278,8 @@ DistributionExponential <- R6::R6Class(
       private$cdf_function <- stats::pexp
       private$quantile_function <- stats::qexp
       private$randomizer_function <- stats::rexp
+
+      invisible(self)
     }
   )
 )
@@ -309,6 +317,8 @@ DistributionUniform <- R6::R6Class(
       private$cdf_function <- stats::punif
       private$quantile_function <- stats::qunif
       private$randomizer_function <- stats::runif
+
+      invisible(self)
     }
   )
 )
