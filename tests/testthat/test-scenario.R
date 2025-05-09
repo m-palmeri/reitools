@@ -7,7 +7,7 @@ test_that("testing initialization and active fields", {
       "income2" = 500,
       "income3" = 200
     ),
-    one_time_items = list(
+    onetime_items = list(
       "onetime1" = 100000,
       "onetime2" = 2500
     )

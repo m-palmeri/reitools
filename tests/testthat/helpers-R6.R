@@ -22,7 +22,7 @@ make_fake_scenario <- function(monthly_income_count = 3,
 
   scenario <- Scenario$new(
     monthly_items = monthly_items,
-    one_time_items = one_time_items
+    onetime_items = one_time_items
   )
   return(scenario)
 }

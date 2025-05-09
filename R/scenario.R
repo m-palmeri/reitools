@@ -53,14 +53,14 @@ Scenario <- R6::R6Class(
   ),
   public = list(
     initialize = function(monthly_items = NULL,
-                          one_time_items = NULL) {
+                          onetime_items = NULL) {
       check_list(monthly_items, allow_null = TRUE)
-      check_list(one_time_items, allow_null = TRUE)
+      check_list(onetime_items, allow_null = TRUE)
 
       purrr::iwalk(monthly_items, function(x, name) {
         self$add_item(name, x, "monthly")
       })
-      purrr::iwalk(one_time_items, function(x, name) {
+      purrr::iwalk(onetime_items, function(x, name) {
         self$add_item(name, x, "one-time")
       })
     },
