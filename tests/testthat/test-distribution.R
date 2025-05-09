@@ -1,35 +1,35 @@
 ### Normal Distribution testing -----------------------------------------------
 
-test_that("NormalDistribution testing initiation and param checks", {
+test_that("DistributionNormal testing initiation and param checks", {
   expect_error(
-    NormalDistribution$new(mean = c(1, 2), sd = 1),
+    DistributionNormal$new(mean = c(1, 2), sd = 1),
     "`mean` must be a number, not a double vector"
   )
   expect_error(
-    NormalDistribution$new(mean = "b", sd = 1),
+    DistributionNormal$new(mean = "b", sd = 1),
     "`mean` must be a number"
   )
 
   expect_error(
-    NormalDistribution$new(mean = 1, sd = c(1, 2)),
+    DistributionNormal$new(mean = 1, sd = c(1, 2)),
     "`sd` must be a number, not a double vector"
   )
   expect_error(
-    NormalDistribution$new(mean = 1, sd = "a"),
+    DistributionNormal$new(mean = 1, sd = "a"),
     "`sd` must be a number"
   )
   expect_error(
-    NormalDistribution$new(mean = 1, sd = -1),
+    DistributionNormal$new(mean = 1, sd = -1),
     "`sd` must be a number larger than or equal to 0"
   )
 })
 
-test_that("NormalDistribution functionality testing", {
+test_that("DistributionNormal functionality testing", {
   means <- c(0, 1, 100, 20)
   sds <- c(1, 0.2, 5, 1000)
 
   purrr::walk2(means, sds, function(mean, sd) {
-    normal_dist <- NormalDistribution$new(
+    normal_dist <- DistributionNormal$new(
       mean = mean,
       sd = sd
     )
@@ -65,40 +65,40 @@ test_that("NormalDistribution functionality testing", {
 
 ### Beta Distribution testing -------------------------------------------------
 
-test_that("BetaDistribution testing initiation and param checks", {
+test_that("DistributionBeta testing initiation and param checks", {
   expect_error(
-    BetaDistribution$new(shape1 = c(1, 2), shape2 = 1),
+    DistributionBeta$new(shape1 = c(1, 2), shape2 = 1),
     "`shape1` must be a number"
   )
   expect_error(
-    BetaDistribution$new(shape1 = "b", shape2 = 1),
+    DistributionBeta$new(shape1 = "b", shape2 = 1),
     "`shape1` must be a number"
   )
   expect_error(
-    BetaDistribution$new(shape1 = -1, shape2 = 1),
+    DistributionBeta$new(shape1 = -1, shape2 = 1),
     "`shape1` must be a number larger than or equal to 0"
   )
 
   expect_error(
-    BetaDistribution$new(shape1 = 1, shape2 = c(1, 2)),
+    DistributionBeta$new(shape1 = 1, shape2 = c(1, 2)),
     "`shape2` must be a number"
   )
   expect_error(
-    BetaDistribution$new(shape1 = 1, shape2 = "a"),
+    DistributionBeta$new(shape1 = 1, shape2 = "a"),
     "`shape2` must be a number"
   )
   expect_error(
-    BetaDistribution$new(shape1 = 1, shape2 = -0.5),
+    DistributionBeta$new(shape1 = 1, shape2 = -0.5),
     "`shape2` must be a number larger than or equal to 0"
   )
 })
 
-test_that("BetaDistribution functionality testing", {
+test_that("DistributionBeta functionality testing", {
   shape1s <- c(0.5, 1, 5, 25)
   shape2s <- c(0.5, 5, 1, 15)
 
   purrr::walk2(shape1s, shape2s, function(shape1, shape2) {
-    beta_dist <- BetaDistribution$new(
+    beta_dist <- DistributionBeta$new(
       shape1 = shape1,
       shape2 = shape2
     )
@@ -133,40 +133,40 @@ test_that("BetaDistribution functionality testing", {
 
 ### Gamma Distribution testing ------------------------------------------------
 
-test_that("GammaDistribution testing initiation and param checks", {
+test_that("DistributionGamma testing initiation and param checks", {
   expect_error(
-    GammaDistribution$new(shape = c(1, 2), rate = 1),
+    DistributionGamma$new(shape = c(1, 2), rate = 1),
     "`shape` must be a number"
   )
   expect_error(
-    GammaDistribution$new(shape = "b", rate = 1),
+    DistributionGamma$new(shape = "b", rate = 1),
     "`shape` must be a number"
   )
   expect_error(
-    GammaDistribution$new(shape = -1, rate = 1),
+    DistributionGamma$new(shape = -1, rate = 1),
     "`shape` must be a number larger than or equal to 0"
   )
 
   expect_error(
-    GammaDistribution$new(shape = 1, rate = c(1, 2)),
+    DistributionGamma$new(shape = 1, rate = c(1, 2)),
     "`rate` must be a number"
   )
   expect_error(
-    GammaDistribution$new(shape = 1, rate = "a"),
+    DistributionGamma$new(shape = 1, rate = "a"),
     "`rate` must be a number"
   )
   expect_error(
-    GammaDistribution$new(shape = 1, rate = -1),
+    DistributionGamma$new(shape = 1, rate = -1),
     "`rate` must be a number larger than or equal to 0"
   )
 })
 
-test_that("GammaDistribution functionality testing", {
+test_that("DistributionGamma functionality testing", {
   shapes <- c(0.5, 1, 5, 25)
   rates <- c(0.5, 5, 1, 15)
 
   purrr::walk2(shapes, rates, function(shape, rate) {
-    gamma_dist <- GammaDistribution$new(
+    gamma_dist <- DistributionGamma$new(
       shape = shape,
       rate = rate
     )
@@ -202,28 +202,28 @@ test_that("GammaDistribution functionality testing", {
 
 ### Exponential Distribution testing ------------------------------------------
 
-test_that("ExponentialDistribution testing initiation and param checks", {
+test_that("DistributionExponential testing initiation and param checks", {
   expect_error(
-    ExponentialDistribution$new(rate = c(1, 2)),
+    DistributionExponential$new(rate = c(1, 2)),
     "`rate` must be a number"
   )
 
   expect_error(
-    ExponentialDistribution$new(rate = "b"),
+    DistributionExponential$new(rate = "b"),
     "`rate` must be a number"
   )
 
   expect_error(
-    ExponentialDistribution$new(rate = -1),
+    DistributionExponential$new(rate = -1),
     "`rate` must be a number larger than or equal to 0"
   )
 })
 
-test_that("ExponentialDistribution functionality testing", {
+test_that("DistributionExponential functionality testing", {
   rates <- c(0.5, 5, 1, 15)
 
   purrr::walk(rates, function(rate) {
-    exp_dist <- ExponentialDistribution$new(
+    exp_dist <- DistributionExponential$new(
       rate = rate
     )
 
@@ -258,40 +258,40 @@ test_that("ExponentialDistribution functionality testing", {
 
 ### Uniform Distribution testing ----------------------------------------------
 
-test_that("UniformDistribution testing initiation and param checks", {
+test_that("DistributionUniform testing initiation and param checks", {
   expect_error(
-    UniformDistribution$new(min = c(1, 2), max = 1),
+    DistributionUniform$new(min = c(1, 2), max = 1),
     "`min` must be a number"
   )
   expect_error(
-    UniformDistribution$new(min = "b", max = 1),
+    DistributionUniform$new(min = "b", max = 1),
     "`min` must be a number"
   )
 
   expect_error(
-    UniformDistribution$new(min = 1, max = c(1, 2)),
+    DistributionUniform$new(min = 1, max = c(1, 2)),
     "`max` must be a number"
   )
   expect_error(
-    UniformDistribution$new(min = 1, max = "a"),
+    DistributionUniform$new(min = 1, max = "a"),
     "`max` must be a number"
   )
   expect_error(
-    UniformDistribution$new(min = 0, max = -1),
+    DistributionUniform$new(min = 0, max = -1),
     "`max` must be a number larger than or equal to min"
   )
   expect_error(
-    UniformDistribution$new(min = 10, max = 5),
+    DistributionUniform$new(min = 10, max = 5),
     "`max` must be a number larger than or equal to min"
   )
 })
 
-test_that("UniformDistribution functionality testing", {
+test_that("DistributionUniform functionality testing", {
   mins <- c(0, -4, 10, 30)
   maxs <- c(0.5, 3, 15, 1000)
 
   purrr::walk2(mins, maxs, function(min, max) {
-    uniform_dist <- UniformDistribution$new(
+    uniform_dist <- DistributionUniform$new(
       min = min,
       max = max
     )
@@ -329,7 +329,7 @@ test_that("UniformDistribution functionality testing", {
 ### graphing method testing ---------------------------------------------------
 
 test_that("plot method works as expected", {
-  normal_dist <- NormalDistribution$new(
+  normal_dist <- DistributionNormal$new(
     mean = 0,
     sd = 1
   )
@@ -341,7 +341,6 @@ test_that("plot method works as expected", {
   ylab <- "ytest"
   main <- "main test"
 
-  pdf(NULL)
   comp <- plot(dnorm, from, to, n = n)
   p1 <- normal_dist$plot(from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
   p2 <- plot(normal_dist, from = from, to = to, n = n, xlab = xlab, ylab = ylab, main = main)
@@ -385,7 +384,7 @@ test_that("plot method works as expected", {
 test_that("snapshot tests for plot method", {
   vdiffr::expect_doppelganger(
     "Normal Distribution graph method",
-    NormalDistribution$new(
+    DistributionNormal$new(
       mean = 5,
       sd = 2
     )$plot(testing = TRUE)
@@ -393,7 +392,7 @@ test_that("snapshot tests for plot method", {
 
   vdiffr::expect_doppelganger(
     "Beta Distribution graph method",
-    BetaDistribution$new(
+    DistributionBeta$new(
       shape1 = 1,
       shape2 = 3
     )$plot(testing = TRUE)
@@ -401,7 +400,7 @@ test_that("snapshot tests for plot method", {
 
   vdiffr::expect_doppelganger(
     "Gamma Distribution graph method",
-    GammaDistribution$new(
+    DistributionGamma$new(
       shape = 2,
       rate = 2
     )$plot(testing = TRUE)
@@ -409,14 +408,14 @@ test_that("snapshot tests for plot method", {
 
   vdiffr::expect_doppelganger(
     "Exponential Distribution graph method",
-    ExponentialDistribution$new(
+    DistributionExponential$new(
       rate = 3
     )$plot(testing = TRUE)
   )
 
   vdiffr::expect_doppelganger(
     "Uniform Distribution graph method",
-    out <- UniformDistribution$new(
+    out <- DistributionUniform$new(
       min = 0,
       max = 3
     )$plot(testing = TRUE)
@@ -427,7 +426,7 @@ test_that("snapshot tests for plot method", {
 ### print method testing ------------------------------------------------------
 
 test_that("print method works as expected", {
-  normal_dist <- NormalDistribution$new(
+  normal_dist <- DistributionNormal$new(
     mean = 2,
     sd = 1
   )
@@ -440,7 +439,7 @@ test_that("print method works as expected", {
     "Normal Distribution \\(mean = 2, sd = 1\\)"
   )
 
-  beta_dist <- BetaDistribution$new(
+  beta_dist <- DistributionBeta$new(
     shape1 = 5,
     shape2 = 2
   )
@@ -449,7 +448,7 @@ test_that("print method works as expected", {
     "Beta Distribution \\(shape1 = 5, shape2 = 2\\)"
   )
 
-  gamma_dist <- GammaDistribution$new(
+  gamma_dist <- DistributionGamma$new(
     shape = 2,
     rate = 5
   )
@@ -458,7 +457,7 @@ test_that("print method works as expected", {
     "Gamma Distribution \\(shape = 2, rate = 5\\)"
   )
 
-  exp_dist <- ExponentialDistribution$new(
+  exp_dist <- DistributionExponential$new(
     rate = 2
   )
   expect_output(
@@ -466,7 +465,7 @@ test_that("print method works as expected", {
     "Exponential Distribution \\(rate = 2\\)"
   )
 
-  uniform_dist <- UniformDistribution$new(
+  uniform_dist <- DistributionUniform$new(
     min = 2,
     max = 100
   )
