@@ -30,9 +30,9 @@ Scenario <- R6::R6Class(
     },
     monthly_profit = function(value) {
       if (missing(value)) {
-        Filter(function(x)  x$type == "monthly", private$items) %>%
-          purrr::map(\(x) x$value) %>%
-          unlist() %>%
+        Filter(function(x)  x$type == "monthly", private$items) |>
+          purrr::map(\(x) x$value) |>
+          unlist() |>
           sum()
       } else {
         stop("monthly_profit is read-only.")
@@ -41,6 +41,7 @@ Scenario <- R6::R6Class(
   ),
   private = list(
     items = list(),
+    calculated_fields = character(),
     .print = function(front = "Scenario defined by the following:") {
       sprintf(
         "%s \n    -%s \n    -%s \n    -%s",
@@ -99,7 +100,40 @@ Scenario <- R6::R6Class(
       }
 
       private$items[[name]] <- NULL
+    },
+
+    make_results = function() {
+      calculated_list <- purrr::map(private$calculated_fields, function(x) self[[x]]) |>
+        rlang::set_names(private$calculated_fields)
+      result_list <- c(
+        self$onetime_items,
+        self$monthly_incomes,
+        self$monthly_expenses,
+        calculated_list
+      ) |>
+        as.data.frame.list()
     }
+  )
+)
+
+ScenarioBH <- R6::R6Class(
+  classname = "ScenarioBH",
+  inherit = Scenario,
+  active = list(
+    annual_roi = function(value) {
+      if (missing(value)) {
+        annual_cash_flow <- self$monthly_profit * 12
+        investment <- self$onetime_items
+        investment$purchase_price <- NULL
+        investment <- sum(unlist(investment))
+        roi <- annual_cash_flow / investment
+      } else {
+        stop("annual_roi is read-only")
+      }
+    }
+  ),
+  private = list(
+    calculated_fields = c("monthly_profit", "annual_roi")
   )
 )
 

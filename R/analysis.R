@@ -64,18 +64,20 @@ Analysis <- R6::R6Class(
       check_distribution(distribution, arg = name)
       self$variable_costs[[name]] <- distribution
     },
-    .evaluate_scenario = function() {
+    evaluate_scenario = function() {
       stop("build out in subclass")
     }
   ),
   public = list(
-    run_simulation = function(N = self$simulation_N) {
+    simulation_results = NULL,
+    run_simulation = function(N = NULL) {
+      N <- N %||% private$simulation_N
       sim_results <- purrr::map(seq_len(N), function(i) {
         private$evaluate_scenario()
-      }) %>%
+      }) |>
         purrr::list_rbind()
 
-      self$sim_results <- sim_results
+      self$simulation_results <- sim_results
 
       invisible(self)
     }
@@ -163,13 +165,30 @@ AnalysisBH <- R6::R6Class(
         dist$random()
       })
 
-      onetime_items <- list(
+      if (self$vacancy$type == "beta") { #vacancy done as a percent of rent
+        scenario_params$vacancy <- -scenario_params$vacancy * scenario_params$rent
+      }
+      if (self$property_management$type == "beta") { #property_management done as a percent of rent
+        scenario_params$property_management <- -scenario_params$property_management * scenario_params$rent
+      }
+
+      all_onetime_items <- list(
         purchase_price = self$purchase_price,
         down_payment = self$down_payment
       )
-      monthly_items <- append(
-        Filter(, self$fixed_costs)
+      all_monthly_items <- c(
+        self$fixed_costs,
+        scenario_params
       )
+
+      scenario <- ScenarioBH$new(
+        monthly_items = all_monthly_items,
+        onetime_items = all_onetime_items
+      )
+
+      results <- scenario$make_results()
+
+      return(results)
     }
   ),
   public = list(

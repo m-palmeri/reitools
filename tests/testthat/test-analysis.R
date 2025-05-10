@@ -230,6 +230,22 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
 
 test_that("AnalysisBH run_simulation testing", {
   analysis_test <- make_fake_analysis(type = "AnalysisBH")
+
+  analysis_test$run_simulation(N = 10)
+  simulation_results <- analysis_test$simulation_results
+
+  nn <- c(names(analysis_test$fixed_costs), names(analysis_test$variable_costs))
+  manual_monthly_profit <- apply(simulation_results[nn], 1, sum)
+  expect_equal(
+    manual_monthly_profit,
+    simulation_results$monthly_profit
+  )
+
+  manual_annual_roi <- manual_monthly_profit * 12 / simulation_results$down_payment
+  expect_equal(
+    manual_annual_roi,
+    simulation_results$annual_roi
+  )
 })
 
 test_that("AnalysisBH testing onetime_extras, fixed_extras, and variable_extras", {

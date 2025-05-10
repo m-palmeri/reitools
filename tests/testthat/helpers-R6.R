@@ -11,7 +11,7 @@ make_fake_scenario <- function(monthly_income_count = 3,
     expense_list <- lapply(monthly_expense_count:1, \(x) -round(runif(1, 1, 1000)))
     names(expense_list) <- paste0("expense", monthly_expense_count:1)
 
-    append(income_list, expense_list)
+    c(income_list, expense_list)
   })
 
   one_time_items <- withr::with_seed(seed, {
@@ -36,14 +36,14 @@ make_fake_analysis <- function(type,
   all_args <- list(
     purchase_price = dots$purchase_price %||% 400000,
     down_payment = dots$down_payment %||% 80000,
-    mortgage_payment = dots$mortgage_payment %||% 1500,
+    mortgage_payment = dots$mortgage_payment %||% -1500,
     rent = dots$rent %||% DistributionNormal$new(2500, 300),
-    property_taxes = dots$property_taxes %||% DistributionNormal$new(200, 25),
-    insurance = dots$insurance %||% DistributionNormal$new(150, 25),
-    maintenance = dots$maintenance %||% DistributionNormal$new(250, 30),
+    property_taxes = dots$property_taxes %||% DistributionNormal$new(-200, 25),
+    insurance = dots$insurance %||% DistributionNormal$new(-150, 25),
+    maintenance = dots$maintenance %||% DistributionNormal$new(-250, 30),
     vacancy = dots$vacancy %||% DistributionBeta$new(2, 18),
-    capital_expenditures = dots$capital_expenditures %||% DistributionNormal$new(300, 50),
-    property_management = dots$property_management %||% DistributionNormal$new(250, 30)
+    capital_expenditures = dots$capital_expenditures %||% DistributionNormal$new(-300, 50),
+    property_management = dots$property_management %||% DistributionNormal$new(-250, 30)
   )
 
   dist_class <- switch(

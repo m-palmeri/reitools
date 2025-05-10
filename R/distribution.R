@@ -33,8 +33,8 @@ Distribution <- R6::R6Class(
         "(",
         purrr::imap(private$.params, .f = function(x, i) {
           paste(i, "=", round(x, round_digits))
-        }) %>%
-          unlist() %>%
+        }) |>
+          unlist() |>
           toString(),
         ")"
       )
@@ -43,24 +43,24 @@ Distribution <- R6::R6Class(
   ),
   public = list(
     pdf = function(x) {
-      args <- append(list(x), private$.params)
+      args <- c(list(x), private$.params)
       value <- do.call(private$pdf_function, args)
       return(value)
     },
     cdf = function(x) {
-      args <- append(list(x), private$.params)
+      args <- c(list(x), private$.params)
       value <- do.call(private$cdf_function, args)
       return(value)
     },
     quantile = function(q) {
-      args <- append(list(q), private$.params)
+      args <- c(list(q), private$.params)
       value <- do.call(private$quantile_function, args)
       return(value)
     },
     random = function(n = 1, seed = NULL) {
       check_number_whole(n)
-      check_number_decimal(seed)
-      args <- append(list(n), private$.params)
+      check_number_decimal(seed, allow_null = TRUE)
+      args <- c(list(n), private$.params)
       value <-ifelse(
         is.null(seed),
         do.call(private$randomizer_function, args),
