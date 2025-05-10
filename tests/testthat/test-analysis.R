@@ -214,15 +214,15 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
     property_management
   )
   expect_equal(
-    names(analysis_test$onetime_costs),
+    names(analysis_test$onetime_fixed_costs),
     c("purchase_price", "down_payment")
   )
   expect_equal(
-    names(analysis_test$fixed_costs),
+    names(analysis_test$monthly_fixed_costs),
     c("mortgage_payment")
   )
   expect_equal(
-    names(analysis_test$variable_costs),
+    names(analysis_test$monthly_variable_costs),
     c("rent", "property_taxes", "insurance", "maintenance", "vacancy",
       "capital_expenditures", "property_management")
   )
@@ -234,7 +234,7 @@ test_that("AnalysisBH run_simulation testing", {
   analysis_test$run_simulation(N = 10)
   simulation_results <- analysis_test$simulation_results
 
-  nn <- c(names(analysis_test$fixed_costs), names(analysis_test$variable_costs))
+  nn <- c(names(analysis_test$monthly_fixed_costs), names(analysis_test$monthly_variable_costs))
   manual_monthly_profit <- apply(simulation_results[nn], 1, sum)
   expect_equal(
     manual_monthly_profit,
