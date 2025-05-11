@@ -290,7 +290,7 @@ check_number_whole <- function(
     } else if (x > max) {
       what <- sprintf("%s smaller than or equal to %s", what, max)
     } else {
-      abort("Unexpected state in OOB check", .internal = TRUE)
+      rlang::abort("Unexpected state in OOB check", .internal = TRUE)
     }
   }
 
@@ -510,7 +510,7 @@ check_character <- function(
   if (!missing(x)) {
     if (rlang::is_character(x)) {
       if (!allow_na && any(is.na(x))) {
-        abort(
+        rlang::abort(
           sprintf("`%s` can't contain NA values.", arg),
           arg = arg,
           call = call
@@ -581,6 +581,70 @@ check_data_frame <- function(
   stop_input_type(
     x,
     "a data frame",
+    ...,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
+# Lists -------------------------------------------------------------------
+
+check_list <- function(
+    x,
+    ...,
+    allow_na = TRUE,
+    allow_null = FALSE,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+) {
+  if (!missing(x)) {
+    if (rlang::is_list(x)) {
+      if (!allow_na && any(is.na(x))) {
+        rlang::abort(
+          sprintf("`%s` can't contain NA values.", arg),
+          arg = arg,
+          call = call
+        )
+      }
+      return(invisible(NULL))
+    }
+    if (allow_null && rlang::is_null(x)) {
+      return(invisible(NULL))
+    }
+  }
+
+  stop_input_type(
+    x,
+    "a list",
+    ...,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
+# custom R6 ---------------------------------------------------------------
+
+check_distribution <- function(
+    x,
+    ...,
+    allow_null = FALSE,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+) {
+  if (!missing(x)) {
+    if ("Distribution" %in% class(x)) {
+      return(invisible(NULL))
+    }
+    if (allow_null && rlang::is_null(x)) {
+      return(invisible(NULL))
+    }
+  }
+
+  stop_input_type(
+    x,
+    "a distribution",
     ...,
     allow_null = allow_null,
     arg = arg,
