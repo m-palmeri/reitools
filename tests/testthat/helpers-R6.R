@@ -46,12 +46,18 @@ make_fake_analysis <- function(type,
     property_management = dots$property_management %||% DistributionNormal$new(-250, 30)
   )
 
+  extra_arg_names <- setdiff(names(dots), names(all_args))
+  extra_args <- dots[extra_arg_names]
+
   dist_class <- switch(
     type,
     "AnalysisBH" = AnalysisBH
   )
 
-  nec_args <- all_args[names(dist_class$active)]
+  nec_args <- c(
+    all_args[names(dist_class$active)],
+    extra_args
+  )
 
   analysis <- do.call(dist_class$new, nec_args)
 
