@@ -61,11 +61,11 @@ Distribution <- R6::R6Class(
       check_number_whole(n)
       check_number_decimal(seed, allow_null = TRUE)
       args <- c(list(n), private$.params)
-      value <-ifelse(
-        is.null(seed),
-        do.call(private$randomizer_function, args),
-        withr::with_seed(seed, do.call(private$randomizer_function, args))
-      )
+      if (is.null(seed)) {
+        value <- do.call(private$randomizer_function, args)
+      } else {
+        value <- withr::with_seed(seed, do.call(private$randomizer_function, args))
+      }
       return(value)
     },
     plot = function(to = NULL,
