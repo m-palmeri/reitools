@@ -5,7 +5,7 @@ Mortgage <- R6::R6Class(
       if (missing(value)) {
         return(private$.purchase_price)
       } else {
-        check_number_decimal(value)
+        check_number_decimal(value, arg = "purchase_price")
         private$.purchase_price = value
       }
     },
@@ -13,7 +13,7 @@ Mortgage <- R6::R6Class(
       if (missing(value)) {
         return(private$.down_payment)
       } else {
-        check_number_decimal(value)
+        check_number_decimal(value, arg = "down_payment")
         private$.down_payment = value
       }
     },
@@ -21,7 +21,7 @@ Mortgage <- R6::R6Class(
       if (missing(value)) {
         return(private$.interest_rate)
       } else {
-        check_number_decimal(value, min = 0, max = 1)
+        check_number_decimal(value, min = 0, max = 1, arg = "interest_rate")
         private$.interest_rate = value
       }
     },
@@ -29,8 +29,22 @@ Mortgage <- R6::R6Class(
       if (missing(value)) {
         return(private$.loan_term)
       } else {
-        check_number_whole(value)
+        check_number_whole(value, arg = "loan_term")
         private$.loan_term = value
+      }
+    },
+    amortization_table = function(value) {
+      if (missing(value)) {
+        private$calculate_amort_table()
+      } else {
+        stop("amortization_table is read-only")
+      }
+    },
+    monthly_payment = function(value) {
+      if (missing(value)) {
+        private$calculate_payment()
+      } else {
+        stop("monthly_payment is read-only")
       }
     }
   ),
@@ -41,36 +55,35 @@ Mortgage <- R6::R6Class(
     .loan_term = numeric(),
 
     calculate_amort_table = function() {
-      monthly_interest <- annual_rate / 12
-      num_payments <- years * 12
+      monthly_interest <- self$interest_rate / 12
+      num_payments <- self$loan_term * 12
       monthly_payment <- self$monthly_payment
 
       payment_number <- 1:num_payments
-      payment <- rep(monthly_payment, num_payments)
+      payment <- numeric(num_payments)
       interest <- numeric(num_payments)
       principal <- numeric(num_payments)
       balance <- numeric(num_payments)
 
       remaining_balance <- self$purchase_price - self$down_payment
 
-      for (t in 1:n) {
-        interest[t] <- round(remaining_balance * monthly_interest, 2)
-        principal[t] <- payment[t] - interest[t]
+      for (t in 1:num_payments) {
+        interest[t] <- remaining_balance * monthly_interest
+        principal[t] <- monthly_payment - interest[t]
         remaining_balance <- remaining_balance - principal[t]
+        payment[t] <- round(interest[t], 2) + round(principal[t], 2)
         balance[t] <- remaining_balance
       }
 
       amortization_table <- data.frame(
-        Month = payment_number,
-        Payment = round(payment, 2),
-        Interest = round(interest, 2),
-        Principal = round(principal, 2),
-        Balance = round(pmax(balance, 0), 2)
+        month = payment_number,
+        total_payment = round(payment, 2),
+        interest_payment = round(interest, 2),
+        principal_payment = round(principal, 2),
+        remaining_balance = round(pmax(balance, 0), 2)
       )
 
-      self$amortization_table <- amortization_table
-
-      invisible(self)
+      return(amortization_table)
     },
 
     calculate_payment = function() {
@@ -81,14 +94,10 @@ Mortgage <- R6::R6Class(
         i = monthly_interest,
         n = num_payments
       )
-      self$monthly_payment <- monthly_payment
-
-      invisible(self)
+      return(monthly_payment)
     }
   ),
   public = list(
-    amortization_table = data.frame(),
-    monthly_payment = numeric(),
     initialize = function(purchase_price,
                           down_payment,
                           interest_rate,
@@ -97,9 +106,6 @@ Mortgage <- R6::R6Class(
       self$down_payment <- down_payment
       self$interest_rate <- interest_rate
       self$loan_term <- loan_term
-
-      private$calculate_payment()
-      private$calculate_amort_table()
 
       invisible(self)
     }
