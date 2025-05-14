@@ -66,6 +66,15 @@ test_that("Initialization and basic active fields work", {
     loan_term = loan_term
   )
 
+  expect_error(
+    mortgage$amortization_table <- "a",
+    "amortization_table is read-only"
+  )
+  expect_error(
+    mortgage$monthly_payment <- "a",
+    "monthly_payment is read-only"
+  )
+
   expect_equal(mortgage$purchase_price, purchase_price)
   expect_equal(mortgage$down_payment, down_payment)
   expect_equal(mortgage$interest_rate, interest_rate)
