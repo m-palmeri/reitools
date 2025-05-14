@@ -86,6 +86,39 @@ Analysis <- R6::R6Class(
     },
     evaluate_scenario = function() {
       stop("build out in subclass")
+    },
+    get_all_items = function() {
+      return(c(
+        self$onetime_fixed_costs,
+        self$monthly_fixed_costs,
+        self$onetime_variable_costs,
+        self$monthly_variable_costs
+      ))
+    },
+    items_to_string = function() {
+      return(sprintf(
+        "    -%s \n    -%s \n    -%s \n    -%s",
+        sprintf(
+          "%-30s %s",
+          "One-time Fixed Costs:",
+          toString(names(self$onetime_fixed_costs))
+        ),
+        sprintf(
+          "%-30s %s",
+          "One-time Variable Costs:",
+          toString(names(self$onetime_variable_costs))
+        ),
+        sprintf(
+          "%-30s %s",
+          "Monthly Fixed Costs:",
+          toString(names(self$monthly_fixed_costs))
+        ),
+        sprintf(
+          "%-30s %s",
+          "Monthly Variable Costs:",
+          toString(names(self$monthly_variable_costs))
+        )
+      ))
     }
   ),
   public = list(
@@ -100,6 +133,11 @@ Analysis <- R6::R6Class(
       self$simulation_results <- sim_results
 
       invisible(self)
+    }
+    print = function() {
+      items_string <- private$items_to_string()
+
+      cat(items_string)
     }
   )
 )
