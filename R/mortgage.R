@@ -42,7 +42,7 @@ Mortgage <- R6::R6Class(
     },
     monthly_payment = function(value) {
       if (missing(value)) {
-        private$calculate_payment()
+        private$calculate_payment(round_digits = 2)
       } else {
         stop("monthly_payment is read-only")
       }
@@ -57,7 +57,7 @@ Mortgage <- R6::R6Class(
     calculate_amort_table = function() {
       monthly_interest <- self$interest_rate / 12
       num_payments <- self$loan_term * 12
-      monthly_payment <- self$monthly_payment
+      monthly_payment <- private$calculate_payment()
 
       payment_number <- 1:num_payments
       payment <- numeric(num_payments)
@@ -86,7 +86,8 @@ Mortgage <- R6::R6Class(
       return(amortization_table)
     },
 
-    calculate_payment = function() {
+    calculate_payment = function(round_digits = NULL) {
+      check_number_whole(round_digits, allow_null = TRUE)
       num_payments <- self$loan_term * 12
       monthly_interest <- self$interest_rate / 12
       monthly_payment <- .calculate_monthly_payment(
@@ -94,7 +95,11 @@ Mortgage <- R6::R6Class(
         i = monthly_interest,
         n = num_payments
       )
-      return(monthly_payment)
+      if (is.null(round_digits)) {
+        return(monthly_payment)
+      } else {
+        return(round(monthly_payment, round_digits))
+      }
     }
   ),
   public = list(

@@ -72,7 +72,6 @@ test_that("Initialization and basic active fields work", {
   expect_equal(mortgage$loan_term, loan_term)
 })
 
-
 test_that("monthly_payment is calculated properly", {
   expect_equal(
     Mortgage$new(
@@ -130,8 +129,7 @@ test_that("monthly_payment is calculated properly", {
   )
 })
 
-
-test_that("amortization_table is calculated properly" {
+test_that("amortization_table is calculated properly", {
   mortgage <- Mortgage$new(
     purchase_price = 700000,
     down_payment = 175000,
