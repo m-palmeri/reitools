@@ -63,6 +63,7 @@ Analysis <- R6::R6Class(
     .onetime_variable_costs = list(),
     .monthly_fixed_costs = list(),
     .monthly_variable_costs = list(),
+    calculated_fields = c(),
     simulation_N = 100000,
     add_onetime_fixed_cost = function(value, name) {
       check_name(name, arg = name)
@@ -101,22 +102,22 @@ Analysis <- R6::R6Class(
         sprintf(
           "%-30s %s",
           "One-time Fixed Costs:",
-          toString(names(self$onetime_fixed_costs))
+          toStringWithAnd(names(self$onetime_fixed_costs))
         ),
         sprintf(
           "%-30s %s",
           "One-time Variable Costs:",
-          toString(names(self$onetime_variable_costs))
+          toStringWithAnd(names(self$onetime_variable_costs))
         ),
         sprintf(
           "%-30s %s",
           "Monthly Fixed Costs:",
-          toString(names(self$monthly_fixed_costs))
+          toStringWithAnd(names(self$monthly_fixed_costs))
         ),
         sprintf(
           "%-30s %s",
           "Monthly Variable Costs:",
-          toString(names(self$monthly_variable_costs))
+          toStringWithAnd(names(self$monthly_variable_costs))
         )
       ))
     }
@@ -133,7 +134,39 @@ Analysis <- R6::R6Class(
       self$simulation_results <- sim_results
 
       invisible(self)
-    }
+    },
+    find_ideal_price = function(...) {
+      dots <- list(...)
+
+      ### checking given parameters
+      # checking that the names are all defined items
+      wrong_items <- setdiff(names(dots), private$calculated_fields)
+      if (length(wrong_items)) {
+        rlang::abort(sprintf(
+          "%s %s calculated %s \n     calculated fields: %s",
+          toStringWithAnd(paste0("`", wrong_items, "`")),
+          ifelse(length(wrong_items) > 1, "parameters are not", "parameter is not a"),
+          ifelse(length(wrong_items) > 1, "fields", "field"),
+          toStringWithAnd(private$calculated_fields)
+        ))
+      }
+      needed_names <- c("min", "percent")
+      purrr::iwalk(dots, function(x, name) {
+        check_list(x, arg = name)
+        # checking that lists have min and percent
+        if (!setequal(names(x), needed_names)) {
+          rlang::abort(sprintf(
+            "`%s` parameter has bad list names. \n    -%s \n    -%s",
+            name,
+            paste("Given Names:", toStringWithAnd(names(x), quote = TRUE)),
+            paste("Expected Names:", toStringWithAnd(needed_names, quote = TRUE))
+          ))
+        }
+
+        check_number_decimal(x$min, arg = glue::glue("{name}$min"))
+        check_number_decimal(x$percent, min = 0, max = 1, arg = glue::glue("{name}$percent"))
+      })
+    },
     print = function() {
       items_string <- private$items_to_string()
 
@@ -218,6 +251,7 @@ AnalysisBH <- R6::R6Class(
     }
   ),
   private = list(
+    calculated_fields = c("monthly_profit", "annual_roi"),
     evaluate_scenario = function() {
       onetime_params <- purrr::map(self$onetime_variable_costs, function(dist) {
         dist$random()

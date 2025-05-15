@@ -1,7 +1,7 @@
 toStringWithAnd <- function(x, quote = FALSE) {
   x <- as.character(x)
   if (quote) {
-    x <- sQuote(x)
+    x <- sQuote(x, FALSE)
   }
   n <- length(x)
   if (n == 0) {
