@@ -644,7 +644,33 @@ check_distribution <- function(
 
   stop_input_type(
     x,
-    "a distribution",
+    "a distribution object",
+    ...,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
+check_financing <- function(
+    x,
+    ...,
+    allow_null = FALSE,
+    arg = rlang::caller_arg(x),
+    call = rlang::caller_env()
+) {
+  if (!missing(x)) {
+    if ("Financing" %in% class(x)) {
+      return(invisible(NULL))
+    }
+    if (allow_null && rlang::is_null(x)) {
+      return(invisible(NULL))
+    }
+  }
+
+  stop_input_type(
+    x,
+    "a financing object",
     ...,
     allow_null = allow_null,
     arg = arg,
