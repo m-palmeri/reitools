@@ -34,9 +34,12 @@ make_fake_analysis <- function(type,
                                ...) {
   dots <- list(...)
   all_args <- list(
-    purchase_price = dots$purchase_price %||% 400000,
-    down_payment = dots$down_payment %||% 80000,
-    mortgage_payment = dots$mortgage_payment %||% -1500,
+    financing = dots$financing %||% Mortgage$new(
+      purchase_price = 400000,
+      down_payment = 80000,
+      interest_rate = 0.07,
+      loan_term = 30
+    ),
     rent = dots$rent %||% DistributionNormal$new(2500, 300),
     property_taxes = dots$property_taxes %||% DistributionNormal$new(-200, 25),
     insurance = dots$insurance %||% DistributionNormal$new(-150, 25),
@@ -54,8 +57,19 @@ make_fake_analysis <- function(type,
     "AnalysisBH" = AnalysisBH
   )
 
+  initialize_args <- formals(dist_class$public_methods$initialize)
+  nec_arg_names <- Filter(is.symbol, initialize_args) |> names()
+
+  if (type == "AnalysisBH") {
+    dist_class <- AnalysisBH
+    nec_args <- c(
+      "financing", "rent", "property_taxes", "insurance", "maintenance", "vacancy",
+      "capital_expenditure", "property_management"
+    )
+  }
+
   nec_args <- c(
-    all_args[names(dist_class$active)],
+    all_args[nec_arg_names],
     extra_args
   )
 
