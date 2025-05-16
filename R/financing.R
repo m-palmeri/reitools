@@ -1,5 +1,10 @@
+Financing <- R6::R6Class(
+  classname = "Financing"
+)
+
 Mortgage <- R6::R6Class(
   classname = "Mortgage",
+  inherit = Financing,
   active = list(
     purchase_price = function(value) {
       if (missing(value)) {
