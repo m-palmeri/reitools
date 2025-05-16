@@ -134,7 +134,7 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
   )
   expect_equal(
     analysis_test$monthly_fixed_costs$monthly_payment,
-    financing$monthly_payment
+    -financing$monthly_payment
   )
   expect_equal(
     analysis_test$rent,
@@ -200,9 +200,12 @@ test_that("AnalysisBH run_simulation testing", {
 })
 
 test_that("AnalysisBH testing extras variables", {
-  purchase_price = 100000
-  down_payment = 20000
-  mortgage_payment = 1000
+  financing = Mortgage$new(
+    purchase_price = 300000,
+    down_payment = 60000,
+    interest_rate = 0.07,
+    loan_term = 30
+  )
   rent = DistributionNormal$new(2500, 300)
   property_taxes = DistributionNormal$new(200, 25)
   insurance = DistributionNormal$new(150, 25)
@@ -229,9 +232,7 @@ test_that("AnalysisBH testing extras variables", {
   )
 
   analysis_test <- AnalysisBH$new(
-    purchase_price = purchase_price,
-    down_payment = down_payment,
-    mortgage_payment = mortgage_payment,
+    financing = financing,
     rent = rent,
     property_taxes = property_taxes,
     insurance = insurance,
@@ -302,7 +303,7 @@ test_that("AnalysisBH testing extras variables", {
   )
 })
 
-test_that("AnalysisBH find_ideal_price method works as expected", {
+test_that("AnalysisBH find_ideal_offer method works as expected", {
   analysis_test <- make_fake_analysis(type = "AnalysisBH")
 
   #debug(analysis_test$find_ideal_price)

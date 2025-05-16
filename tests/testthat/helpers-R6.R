@@ -40,7 +40,7 @@ make_fake_analysis <- function(type,
       interest_rate = 0.07,
       loan_term = 30
     ),
-    rent = dots$rent %||% DistributionNormal$new(2500, 300),
+    rent = dots$rent %||% DistributionNormal$new(4000, 300),
     property_taxes = dots$property_taxes %||% DistributionNormal$new(-200, 25),
     insurance = dots$insurance %||% DistributionNormal$new(-150, 25),
     maintenance = dots$maintenance %||% DistributionNormal$new(-250, 30),
