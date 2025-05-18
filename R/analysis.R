@@ -67,7 +67,7 @@ Analysis <- R6::R6Class(
           private$add_onetime_fixed_cost(value[[x]], x)
         })
         purrr::walk(value$monthly_costs, function(x) {
-          private$add_monthly_fixed_cost(value[[x]], x)
+          private$add_monthly_fixed_cost(-value[[x]], x)
         })
       }
     }
@@ -142,7 +142,9 @@ Analysis <- R6::R6Class(
     run_simulation = function(N = NULL) {
       N <- N %||% private$simulation_N
       sim_results <- purrr::map(seq_len(N), function(i) {
-        private$evaluate_scenario()
+        scenario <- private$create_scenario(type = "random")
+        results <- scenario$make_results()
+        results
       }) |>
         purrr::list_rbind()
 
@@ -150,7 +152,7 @@ Analysis <- R6::R6Class(
 
       invisible(self)
     },
-    find_ideal_price = function(...) {
+    find_ideal_offer = function(...) {
       dots <- list(...)
 
       ### checking given parameters
@@ -181,8 +183,9 @@ Analysis <- R6::R6Class(
         check_number_decimal(x$percent, min = 0, max = 1, arg = glue::glue("{name}$percent"))
       })
 
-      # finding starting position
-      middle
+      # running optimization
+
+      return(1)
     },
     print = function() {
       items_string <- private$items_to_string()
@@ -248,7 +251,7 @@ AnalysisBH <- R6::R6Class(
   ),
   private = list(
     calculated_fields = c("monthly_profit", "annual_roi"),
-    evaluate_scenario = function(type = "random") {
+    create_scenario = function(type = "random") {
       if (type == "random") {
         onetime_params <- purrr::map(self$onetime_variable_costs, function(dist) {
           dist$random()
@@ -288,9 +291,7 @@ AnalysisBH <- R6::R6Class(
         onetime_items = all_onetime_items
       )
 
-      results <- scenario$make_results()
-
-      return(results)
+      return(scenario)
     }
   ),
   public = list(

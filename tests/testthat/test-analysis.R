@@ -306,37 +306,39 @@ test_that("AnalysisBH testing extras variables", {
 test_that("AnalysisBH find_ideal_offer method works as expected", {
   analysis_test <- make_fake_analysis(type = "AnalysisBH")
 
-  #debug(analysis_test$find_ideal_price)
   expect_error(
-    analysis_test$find_ideal_price(test = list("a")),
+    analysis_test$find_ideal_offer(test = list("a")),
     "`test` parameter is not a calculated field"
   )
   expect_error(
-    analysis_test$find_ideal_price(test1 = list("a"), test2 = list("b")),
+    analysis_test$find_ideal_offer(test1 = list("a"), test2 = list("b")),
     "`test1` and `test2` parameters are not calculated fields"
   )
   expect_error(
-    analysis_test$find_ideal_price(monthly_profit = list(a = 1)),
+    analysis_test$find_ideal_offer(monthly_profit = list(a = 1)),
     "`monthly_profit` parameter has bad list names.*'a'"
   )
   expect_error(
-    analysis_test$find_ideal_price(monthly_profit = list(a = 1, b = 2)),
+    analysis_test$find_ideal_offer(monthly_profit = list(a = 1, b = 2)),
     "`monthly_profit` parameter has bad list names.*'a' and 'b'"
   )
   expect_error(
-    analysis_test$find_ideal_price(monthly_profit = list(min = "a", percent = 0.5)),
+    analysis_test$find_ideal_offer(monthly_profit = list(min = "a", percent = 0.5)),
     "`monthly_profit\\$min` must be a number"
   )
   expect_error(
-    analysis_test$find_ideal_price(monthly_profit = list(min = 1, percent = "a")),
+    analysis_test$find_ideal_offer(monthly_profit = list(min = 1, percent = "a")),
     "`monthly_profit\\$percent` must be a number"
   )
   expect_error(
-    analysis_test$find_ideal_price(monthly_profit = list(min = 1, percent = -0.5)),
+    analysis_test$find_ideal_offer(monthly_profit = list(min = 1, percent = -0.5)),
     "`monthly_profit\\$percent` must be a number between 0 and 1"
   )
   expect_error(
-    analysis_test$find_ideal_price(monthly_profit = list(min = 1, percent = 2)),
+    analysis_test$find_ideal_offer(monthly_profit = list(min = 1, percent = 2)),
     "`monthly_profit\\$percent` must be a number between 0 and 1"
   )
+
+  debug(analysis_test$find_ideal_offer)
+  analysis_test$find_ideal_offer()
 })

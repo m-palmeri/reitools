@@ -110,6 +110,7 @@ Mortgage <- R6::R6Class(
   public = list(
     onetime_costs = c("down_payment"),
     monthly_costs = c("monthly_payment"),
+    controllable_inputs = c("purchase_price", "down_payment"),
     initialize = function(purchase_price,
                           down_payment,
                           interest_rate,
