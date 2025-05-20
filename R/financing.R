@@ -121,6 +121,18 @@ Mortgage <- R6::R6Class(
       self$loan_term <- loan_term
 
       invisible(self)
+    },
+    rule_check = function() {
+      # purchase price has to be greater than 0
+      if (self$purchase_price < 0) return(FALSE)
+      # down payment has to be greater than 0
+      if (self$down_payment < 0) return(FALSE)
+      # down payment has to be less than purchase price
+      if (self$down_payment > self$purchase_price) return(FALSE)
+      # down payment has to be at least 3.5% of the purchase price
+      if (self$down_payment / self$purchase_price < 0.035) return(FALSE)
+
+      return(TRUE)
     }
   )
 )

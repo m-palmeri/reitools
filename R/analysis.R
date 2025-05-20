@@ -135,6 +135,36 @@ Analysis <- R6::R6Class(
           toStringWithAnd(names(self$monthly_variable_costs))
         )
       ))
+    },
+    objective_function = function(params,
+                                  rules) {
+      finance <- self$financing$clone()
+      for (i in seq_along(params)) {
+        name <- self$financing$controllable_inputs[i]
+        finance[[name]] <- params[i]
+      }
+      self$financing <- finance
+      self$run_simulation(N = 1000)
+
+      sim <- self$simulation_results
+
+      if (!self$financing$rule_check()) {
+        return(10000000000000)
+      }
+
+      # calculating penalty
+      penalty <- 0
+      for (i in seq_along(rules)) {
+        rule <- rules[[i]]
+        name <- names(rules)[i]
+        prop <- sum(sim[[name]] > rule$min) / nrow(sim)
+        if (prop < rule$percent) {
+          new_penalty <- (rule$percent - prop) * 1000000000
+          penalty <- penalty + new_penalty
+        }
+      }
+
+      return(penalty - self$financing$purchase_price)
     }
   ),
   public = list(
@@ -156,6 +186,11 @@ Analysis <- R6::R6Class(
       dots <- list(...)
 
       ### checking given parameters
+      # checking that parameters were given
+      if (length(dots) == 0) {
+        rlang::abort("No parameters supplied to `find_ideal_offer` method")
+      }
+
       # checking that the names are all defined items
       wrong_items <- setdiff(names(dots), private$calculated_fields)
       if (length(wrong_items)) {
@@ -183,7 +218,30 @@ Analysis <- R6::R6Class(
         check_number_decimal(x$percent, min = 0, max = 1, arg = glue::glue("{name}$percent"))
       })
 
+      # setting up optimization function
+      obj_func <- function(params) {
+        private$objective_function(
+          params = params,
+          rules = dots
+        )
+      }
+
       # running optimization
+      params <- purrr::map(self$financing$controllable_inputs, function(x) {
+        self$financing[[x]]
+      })
+      params <- unlist(params)
+      #opt_func(unlist(params))
+
+      result <- nloptr::nloptr(
+        x0 = params,
+        eval_f = obj_func,
+        lb = rep(0, length(params)),
+        ub = rep(max(params), length(params)),
+        opts = list("algorithm" = "NLOPT_LN_COBYLA",
+                    "xtol_rel" = 1e-4,
+                    "maxeval" = 100)
+      )
 
       return(1)
     },

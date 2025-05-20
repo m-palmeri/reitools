@@ -307,6 +307,10 @@ test_that("AnalysisBH find_ideal_offer method works as expected", {
   analysis_test <- make_fake_analysis(type = "AnalysisBH")
 
   expect_error(
+    analysis_test$find_ideal_offer(),
+    "No parameters supplied to `find_ideal_offer` method"
+  )
+  expect_error(
     analysis_test$find_ideal_offer(test = list("a")),
     "`test` parameter is not a calculated field"
   )
@@ -340,5 +344,9 @@ test_that("AnalysisBH find_ideal_offer method works as expected", {
   )
 
   debug(analysis_test$find_ideal_offer)
-  analysis_test$find_ideal_offer()
+  debug(analysis_test$.__enclos_env__$private$objective_function)
+  analysis_test$find_ideal_offer(
+    monthly_profit = list(min = 0, percent = .975),
+    annual_roi = list(min = 0.1, percent = 0.5)
+  )
 })
