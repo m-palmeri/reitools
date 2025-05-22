@@ -56,6 +56,20 @@ Analysis <- R6::R6Class(
         })
         private$.monthly_variable_costs <- value
       }
+    },
+    financing = function(value) {
+      if (missing(value)) {
+        return(private$.financing)
+      } else {
+        check_financing(value, arg = "financing")
+        private$.financing <- value
+        purrr::walk(value$onetime_costs, function(x) {
+          private$add_onetime_fixed_cost(value[[x]], x)
+        })
+        purrr::walk(value$monthly_costs, function(x) {
+          private$add_monthly_fixed_cost(-value[[x]], x)
+        })
+      }
     }
   ),
   private = list(
@@ -63,6 +77,8 @@ Analysis <- R6::R6Class(
     .onetime_variable_costs = list(),
     .monthly_fixed_costs = list(),
     .monthly_variable_costs = list(),
+    .financing = NULL,
+    calculated_fields = c(),
     simulation_N = 100000,
     add_onetime_fixed_cost = function(value, name) {
       check_name(name, arg = name)
@@ -86,6 +102,69 @@ Analysis <- R6::R6Class(
     },
     evaluate_scenario = function() {
       stop("build out in subclass")
+    },
+    get_all_items = function() {
+      return(c(
+        self$onetime_fixed_costs,
+        self$monthly_fixed_costs,
+        self$onetime_variable_costs,
+        self$monthly_variable_costs
+      ))
+    },
+    items_to_string = function() {
+      return(sprintf(
+        "    -%s \n    -%s \n    -%s \n    -%s",
+        sprintf(
+          "%-30s %s",
+          "One-time Fixed Costs:",
+          toStringWithAnd(names(self$onetime_fixed_costs))
+        ),
+        sprintf(
+          "%-30s %s",
+          "One-time Variable Costs:",
+          toStringWithAnd(names(self$onetime_variable_costs))
+        ),
+        sprintf(
+          "%-30s %s",
+          "Monthly Fixed Costs:",
+          toStringWithAnd(names(self$monthly_fixed_costs))
+        ),
+        sprintf(
+          "%-30s %s",
+          "Monthly Variable Costs:",
+          toStringWithAnd(names(self$monthly_variable_costs))
+        )
+      ))
+    },
+    objective_function = function(params,
+                                  rules) {
+      finance <- self$financing$clone()
+      for (i in seq_along(params)) {
+        name <- self$financing$controllable_inputs[i]
+        finance[[name]] <- params[i]
+      }
+      self$financing <- finance
+      self$run_simulation(N = 1000)
+
+      sim <- self$simulation_results
+
+      if (!self$financing$rule_check()) {
+        return(10000000000000)
+      }
+
+      # calculating penalty
+      penalty <- 0
+      for (i in seq_along(rules)) {
+        rule <- rules[[i]]
+        name <- names(rules)[i]
+        prop <- sum(sim[[name]] > rule$min) / nrow(sim)
+        if (prop < rule$percent) {
+          new_penalty <- (rule$percent - prop) * 1000000000
+          penalty <- penalty + new_penalty
+        }
+      }
+
+      return(penalty - self$financing$purchase_price)
     }
   ),
   public = list(
@@ -93,13 +172,83 @@ Analysis <- R6::R6Class(
     run_simulation = function(N = NULL) {
       N <- N %||% private$simulation_N
       sim_results <- purrr::map(seq_len(N), function(i) {
-        private$evaluate_scenario()
+        scenario <- private$create_scenario(type = "random")
+        results <- scenario$make_results()
+        results
       }) |>
         purrr::list_rbind()
 
       self$simulation_results <- sim_results
 
       invisible(self)
+    },
+    find_ideal_offer = function(...) {
+      dots <- list(...)
+
+      ### checking given parameters
+      # checking that parameters were given
+      if (length(dots) == 0) {
+        rlang::abort("No parameters supplied to `find_ideal_offer` method")
+      }
+
+      # checking that the names are all defined items
+      wrong_items <- setdiff(names(dots), private$calculated_fields)
+      if (length(wrong_items)) {
+        rlang::abort(sprintf(
+          "%s %s calculated %s \n     calculated fields: %s",
+          toStringWithAnd(paste0("`", wrong_items, "`")),
+          ifelse(length(wrong_items) > 1, "parameters are not", "parameter is not a"),
+          ifelse(length(wrong_items) > 1, "fields", "field"),
+          toStringWithAnd(private$calculated_fields)
+        ))
+      }
+      needed_names <- c("min", "percent")
+      purrr::iwalk(dots, function(x, name) {
+        check_list(x, arg = name)
+        # checking that lists have min and percent
+        if (!setequal(names(x), needed_names)) {
+          rlang::abort(sprintf(
+            "`%s` parameter has bad list names. \n    -%s \n    -%s",
+            name,
+            paste("Given Names:", toStringWithAnd(names(x), quote = TRUE)),
+            paste("Expected Names:", toStringWithAnd(needed_names, quote = TRUE))
+          ))
+        }
+        check_number_decimal(x$min, arg = glue::glue("{name}$min"))
+        check_number_decimal(x$percent, min = 0, max = 1, arg = glue::glue("{name}$percent"))
+      })
+
+      # setting up optimization function
+      obj_func <- function(params) {
+        private$objective_function(
+          params = params,
+          rules = dots
+        )
+      }
+
+      # running optimization
+      params <- purrr::map(self$financing$controllable_inputs, function(x) {
+        self$financing[[x]]
+      })
+      params <- unlist(params)
+      #opt_func(unlist(params))
+
+      result <- nloptr::nloptr(
+        x0 = params,
+        eval_f = obj_func,
+        lb = rep(0, length(params)),
+        ub = rep(max(params), length(params)),
+        opts = list("algorithm" = "NLOPT_LN_COBYLA",
+                    "xtol_rel" = 1e-4,
+                    "maxeval" = 100)
+      )
+
+      return(1)
+    },
+    print = function() {
+      items_string <- private$items_to_string()
+
+      cat(items_string)
     }
   )
 )
@@ -108,27 +257,6 @@ AnalysisBH <- R6::R6Class(
   classname = "AnalysisBH",
   inherit = Analysis,
   active = list(
-    purchase_price = function(value) {
-      if (missing(value)) {
-        return(self$onetime_fixed_costs$purchase_price)
-      } else {
-        private$add_onetime_fixed_cost(value, "purchase_price")
-      }
-    },
-    down_payment = function(value) {
-      if (missing(value)) {
-        return(self$onetime_fixed_costs$down_payment)
-      } else {
-        private$add_onetime_fixed_cost(value, "down_payment")
-      }
-    },
-    mortgage_payment = function(value) {
-      if (missing(value)) {
-        return(self$monthly_fixed_costs$mortgage_payment)
-      } else {
-        private$add_monthly_fixed_cost(value, "mortgage_payment")
-      }
-    },
     rent = function(value) {
       if (missing(value)) {
         return(self$monthly_variable_costs$rent)
@@ -180,14 +308,25 @@ AnalysisBH <- R6::R6Class(
     }
   ),
   private = list(
-    evaluate_scenario = function() {
-      onetime_params <- purrr::map(self$onetime_variable_costs, function(dist) {
-        dist$random()
-      })
+    calculated_fields = c("monthly_profit", "annual_roi"),
+    create_scenario = function(type = "random") {
+      if (type == "random") {
+        onetime_params <- purrr::map(self$onetime_variable_costs, function(dist) {
+          dist$random()
+        })
 
-      month_params <- purrr::map(self$monthly_variable_costs, function(dist) {
-        dist$random()
-      })
+        month_params <- purrr::map(self$monthly_variable_costs, function(dist) {
+          dist$random()
+        })
+      } else if (type == "half") {
+        onetime_params <- purrr::map(self$onetime_variable_costs, function(dist) {
+          dist$quantile(0.5)
+        })
+
+        month_params <- purrr::map(self$monthly_variable_costs, function(dist) {
+          dist$quantile(0.5)
+        })
+      }
 
       if (self$vacancy$type == "beta") { #vacancy done as a percent of rent
         month_params$vacancy <- -month_params$vacancy * month_params$rent
@@ -210,15 +349,11 @@ AnalysisBH <- R6::R6Class(
         onetime_items = all_onetime_items
       )
 
-      results <- scenario$make_results()
-
-      return(results)
+      return(scenario)
     }
   ),
   public = list(
-    initialize = function(purchase_price,
-                          down_payment,
-                          mortgage_payment,
+    initialize = function(financing,
                           rent,
                           property_taxes,
                           insurance,
@@ -231,9 +366,7 @@ AnalysisBH <- R6::R6Class(
                           monthly_fixed_extras = NULL,
                           monthly_variable_extras = NULL,
                           simulation_N = 100000) {
-      self$purchase_price <- purchase_price
-      self$down_payment <- down_payment
-      self$mortgage_payment <- mortgage_payment
+      self$financing <- financing
       self$rent <- rent
       self$property_taxes <- property_taxes
       self$insurance <- insurance

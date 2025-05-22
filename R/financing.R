@@ -1,5 +1,10 @@
+Financing <- R6::R6Class(
+  classname = "Financing"
+)
+
 Mortgage <- R6::R6Class(
   classname = "Mortgage",
+  inherit = Financing,
   active = list(
     purchase_price = function(value) {
       if (missing(value)) {
@@ -103,6 +108,9 @@ Mortgage <- R6::R6Class(
     }
   ),
   public = list(
+    onetime_costs = c("down_payment"),
+    monthly_costs = c("monthly_payment"),
+    controllable_inputs = c("purchase_price", "down_payment"),
     initialize = function(purchase_price,
                           down_payment,
                           interest_rate,
@@ -113,6 +121,18 @@ Mortgage <- R6::R6Class(
       self$loan_term <- loan_term
 
       invisible(self)
+    },
+    rule_check = function() {
+      # purchase price has to be greater than 0
+      if (self$purchase_price < 0) return(FALSE)
+      # down payment has to be greater than 0
+      if (self$down_payment < 0) return(FALSE)
+      # down payment has to be less than purchase price
+      if (self$down_payment > self$purchase_price) return(FALSE)
+      # down payment has to be at least 3.5% of the purchase price
+      if (self$down_payment / self$purchase_price < 0.035) return(FALSE)
+
+      return(TRUE)
     }
   )
 )

@@ -1,20 +1,21 @@
 test_that("Buy and Hold Analysis initialization and active field testing", {
-  purchase_price = 100000
-  down_payment = 20000
-  mortgage_payment = 1000
+  financing = Mortgage$new(
+    purchase_price = 100000,
+    down_payment = 20000,
+    interest_rate = 0.07,
+    loan_term = 30
+  )
   rent = DistributionNormal$new(2500, 300)
-  property_taxes = DistributionNormal$new(200, 25)
-  insurance = DistributionNormal$new(150, 25)
-  maintenance = DistributionNormal$new(250, 30)
+  property_taxes = DistributionNormal$new(-200, 25)
+  insurance = DistributionNormal$new(-150, 25)
+  maintenance = DistributionNormal$new(-250, 30)
   vacancy = DistributionBeta$new(2, 18)
-  capital_expenditures = DistributionNormal$new(300, 50)
-  property_management = DistributionNormal$new(250, 30)
+  capital_expenditures = DistributionNormal$new(-300, 50)
+  property_management = DistributionNormal$new(-250, 30)
 
   expect_error(
     AnalysisBH$new(
-      purchase_price = "a",
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = "a",
       rent = rent,
       property_taxes = property_taxes,
       insurance = insurance,
@@ -23,43 +24,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = capital_expenditures,
       property_management = property_management
     ),
-    "`purchase_price` must be a number"
+    "`financing` must be a financing object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = "a",
-      mortgage_payment = mortgage_payment,
-      rent = rent,
-      property_taxes = property_taxes,
-      insurance = insurance,
-      maintenance = maintenance,
-      vacancy = vacancy,
-      capital_expenditures = capital_expenditures,
-      property_management = property_management
-    ),
-    "`down_payment` must be a number"
-  )
-  expect_error(
-    AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = "a",
-      rent = rent,
-      property_taxes = property_taxes,
-      insurance = insurance,
-      maintenance = maintenance,
-      vacancy = vacancy,
-      capital_expenditures = capital_expenditures,
-      property_management = property_management
-    ),
-    "`mortgage_payment` must be a number"
-  )
-  expect_error(
-    AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = "a",
       property_taxes = property_taxes,
       insurance = insurance,
@@ -68,13 +37,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = capital_expenditures,
       property_management = property_management
     ),
-    "`rent` must be a distribution"
+    "`rent` must be a distribution object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = rent,
       property_taxes = "a",
       insurance = insurance,
@@ -83,13 +50,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = capital_expenditures,
       property_management = property_management
     ),
-    "`property_taxes` must be a distribution"
+    "`property_taxes` must be a distribution object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = rent,
       property_taxes = property_taxes,
       insurance = "a",
@@ -98,13 +63,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = capital_expenditures,
       property_management = property_management
     ),
-    "`insurance` must be a distribution"
+    "`insurance` must be a distribution object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = rent,
       property_taxes = property_taxes,
       insurance = insurance,
@@ -113,13 +76,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = capital_expenditures,
       property_management = property_management
     ),
-    "`maintenance` must be a distribution"
+    "`maintenance` must be a distribution object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = rent,
       property_taxes = property_taxes,
       insurance = insurance,
@@ -128,13 +89,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = capital_expenditures,
       property_management = property_management
     ),
-    "`vacancy` must be a distribution"
+    "`vacancy` must be a distribution object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = rent,
       property_taxes = property_taxes,
       insurance = insurance,
@@ -143,13 +102,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
       capital_expenditures = "a",
       property_management = property_management
     ),
-    "`capital_expenditures` must be a distribution"
+    "`capital_expenditures` must be a distribution object"
   )
   expect_error(
     AnalysisBH$new(
-      purchase_price = purchase_price,
-      down_payment = down_payment,
-      mortgage_payment = mortgage_payment,
+      financing = financing,
       rent = rent,
       property_taxes = property_taxes,
       insurance = insurance,
@@ -162,9 +119,7 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
   )
 
   analysis_test <- AnalysisBH$new(
-    purchase_price = purchase_price,
-    down_payment = down_payment,
-    mortgage_payment = mortgage_payment,
+    financing = financing,
     rent = rent,
     property_taxes = property_taxes,
     insurance = insurance,
@@ -174,16 +129,12 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
     property_management = property_management
   )
   expect_equal(
-    analysis_test$purchase_price,
-    purchase_price
+    analysis_test$onetime_fixed_costs$down_payment,
+    financing$down_payment
   )
   expect_equal(
-    analysis_test$down_payment,
-    down_payment
-  )
-  expect_equal(
-    analysis_test$mortgage_payment,
-    mortgage_payment
+    analysis_test$monthly_fixed_costs$monthly_payment,
+    -financing$monthly_payment
   )
   expect_equal(
     analysis_test$rent,
@@ -215,11 +166,11 @@ test_that("Buy and Hold Analysis initialization and active field testing", {
   )
   expect_equal(
     names(analysis_test$onetime_fixed_costs),
-    c("purchase_price", "down_payment")
+    c("down_payment")
   )
   expect_equal(
     names(analysis_test$monthly_fixed_costs),
-    c("mortgage_payment")
+    c("monthly_payment")
   )
   expect_equal(
     names(analysis_test$monthly_variable_costs),
@@ -249,9 +200,12 @@ test_that("AnalysisBH run_simulation testing", {
 })
 
 test_that("AnalysisBH testing extras variables", {
-  purchase_price = 100000
-  down_payment = 20000
-  mortgage_payment = 1000
+  financing = Mortgage$new(
+    purchase_price = 300000,
+    down_payment = 60000,
+    interest_rate = 0.07,
+    loan_term = 30
+  )
   rent = DistributionNormal$new(2500, 300)
   property_taxes = DistributionNormal$new(200, 25)
   insurance = DistributionNormal$new(150, 25)
@@ -278,9 +232,7 @@ test_that("AnalysisBH testing extras variables", {
   )
 
   analysis_test <- AnalysisBH$new(
-    purchase_price = purchase_price,
-    down_payment = down_payment,
-    mortgage_payment = mortgage_payment,
+    financing = financing,
     rent = rent,
     property_taxes = property_taxes,
     insurance = insurance,
@@ -348,5 +300,53 @@ test_that("AnalysisBH testing extras variables", {
   expect_equal(
     analysis_test$monthly_variable_costs$mve_test2,
     monthly_variable_extras$mve_test2
+  )
+})
+
+test_that("AnalysisBH find_ideal_offer method works as expected", {
+  analysis_test <- make_fake_analysis(type = "AnalysisBH")
+
+  expect_error(
+    analysis_test$find_ideal_offer(),
+    "No parameters supplied to `find_ideal_offer` method"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(test = list("a")),
+    "`test` parameter is not a calculated field"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(test1 = list("a"), test2 = list("b")),
+    "`test1` and `test2` parameters are not calculated fields"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(monthly_profit = list(a = 1)),
+    "`monthly_profit` parameter has bad list names.*'a'"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(monthly_profit = list(a = 1, b = 2)),
+    "`monthly_profit` parameter has bad list names.*'a' and 'b'"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(monthly_profit = list(min = "a", percent = 0.5)),
+    "`monthly_profit\\$min` must be a number"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(monthly_profit = list(min = 1, percent = "a")),
+    "`monthly_profit\\$percent` must be a number"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(monthly_profit = list(min = 1, percent = -0.5)),
+    "`monthly_profit\\$percent` must be a number between 0 and 1"
+  )
+  expect_error(
+    analysis_test$find_ideal_offer(monthly_profit = list(min = 1, percent = 2)),
+    "`monthly_profit\\$percent` must be a number between 0 and 1"
+  )
+
+  debug(analysis_test$find_ideal_offer)
+  debug(analysis_test$.__enclos_env__$private$objective_function)
+  analysis_test$find_ideal_offer(
+    monthly_profit = list(min = 0, percent = .975),
+    annual_roi = list(min = 0.1, percent = 0.5)
   )
 })
